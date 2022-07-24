@@ -17,3 +17,12 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::group(['namespace' => 'Popup'], function () {
+    Route::prefix('/popup')->group(function () {
+        Route::post('/getStartForm', 'PopupController@getStartGameForm');
+    });
+});
+
+Route::post('/getMainLayout', 'IndexController@getMainLayout');
+Route::post('/getMainInfo', 'IndexController@getMainInfo');
