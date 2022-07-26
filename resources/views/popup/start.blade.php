@@ -15,7 +15,7 @@
         <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mt-3">
             <div>
                 <div class="p-1 mb-2 bg-primary"></div>
-                <select name="blue-gamer" class="form-select" aria-label="Default select example">
+                <select name="blue-gamer" class="form-select">
                     <option selected value="0">Выберите игрока</option>
                     @foreach($users as $user)
                         <option value="{{ $user['id'] }}">{{ $user['name'] }}</option>
@@ -24,7 +24,7 @@
             </div>
             <div>
                 <div class="p-1 mb-2 bg-danger"></div>
-                <select name="red-gamer" class="form-select" aria-label="Default select example">
+                <select name="red-gamer" class="form-select">
                     <option selected value="0">Выберите игрока</option>
                     @foreach($users as $user)
                         <option value="{{ $user['id'] }}">{{ $user['name'] }}</option>
@@ -32,5 +32,19 @@
                 </select>
             </div>
         </div>
+        <table class="text-center mt-2" style="width: 100%">
+            <tbody>
+            <tr>
+                <td>Задержка</td>
+                <td>
+                    <select name="time_delay" class="form-select">
+                        <option value="15" selected>15 секунд</option>
+                        <option value="10">10 секунд</option>
+                        <option value="5">5 секунд</option>
+                    </select>
+                </td>
+            </tr>
+            </tbody>
+        </table>
     </form>
 </div>

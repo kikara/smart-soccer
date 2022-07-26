@@ -12,7 +12,7 @@ async def hello(uri):
 
 
 def print_state(channel):
-    asyncio.run(hello("ws://192.168.1.30:8080"))
+    asyncio.run(hello("ws://192.168.133.86:8081"))
 
 GPIO.add_event_detect(23, GPIO.RISING, callback = print_state)
 
