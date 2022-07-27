@@ -38,12 +38,12 @@ trait AuthenticatesUsers
         // If the class is using the ThrottlesLogins trait, we can automatically throttle
         // the login attempts for this application. We'll key this by the username and
         // the IP address of the client making these requests into this application.
-        if (method_exists($this, 'hasTooManyLoginAttempts') &&
-            $this->hasTooManyLoginAttempts($request)) {
-            $this->fireLockoutEvent($request);
-
-            return $this->sendLockoutResponse($request);
-        }
+//        if (method_exists($this, 'hasTooManyLoginAttempts') &&
+//            $this->hasTooManyLoginAttempts($request)) {
+//            $this->fireLockoutEvent($request);
+//
+//            return $this->sendLockoutResponse($request);
+//        }
 
         if ($this->attemptLogin($request)) {
             if ($request->hasSession()) {
@@ -117,9 +117,10 @@ trait AuthenticatesUsers
             return $response;
         }
 
-        return $request->wantsJson()
-            ? new JsonResponse([], 204)
-            : redirect()->intended($this->redirectPath());
+        return redirect()->intended($this->redirectPath());
+//        return $request->wantsJson()
+//            ? new JsonResponse([], 204)
+//            : redirect()->intended($this->redirectPath());
     }
 
     /**
@@ -156,7 +157,7 @@ trait AuthenticatesUsers
      */
     public function username()
     {
-        return 'email';
+        return 'login';
     }
 
     /**

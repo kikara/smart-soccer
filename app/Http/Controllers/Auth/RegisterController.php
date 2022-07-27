@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Http\Controllers\Auth\Traits\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class RegisterController extends Controller
 {
@@ -51,9 +52,8 @@ class RegisterController extends Controller
     protected function validator(array $data)
     {
         return Validator::make($data, [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'login' => ['required', 'string', 'unique:users'],
+            'password' => ['required', 'string', 'min:8'],
         ]);
     }
 
@@ -66,9 +66,9 @@ class RegisterController extends Controller
     protected function create(array $data)
     {
         return User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
+            'login' => $data['login'],
             'password' => Hash::make($data['password']),
+            'telegram_token' => Str::random(),
         ]);
     }
 }

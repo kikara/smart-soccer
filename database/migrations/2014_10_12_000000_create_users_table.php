@@ -15,8 +15,13 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
+            $table->string('name')->default('');
+            $table->string('login')->unique();
+            $table->string('email')->default('');
+            $table->string('telegram_token')->unique()->default('');
+            $table->string('telegram_chat_id')->default('');
+            $table->string('telegram_nickname')->default('');
+            $table->string('avatar_path')->default('');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();

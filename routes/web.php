@@ -21,4 +21,9 @@ Auth::routes();
 Route::get('/goalTest', function () {
     return view('goal');
 });
+
+Route::group(['namespace' => 'UserProfile'], function () {
+    Route::get('/profile', 'UserProfileController@index')->name('profile');
+});
+
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

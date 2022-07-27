@@ -26,3 +26,11 @@ Route::group(['namespace' => 'Popup'], function () {
 
 Route::post('/getMainLayout', 'IndexController@getMainLayout');
 Route::post('/getMainInfo', 'IndexController@getMainInfo');
+
+
+Route::group(['namespace' => 'Bot'], function () {
+    Route::prefix('/bot')->group(function () {
+        Route::post('/getGamers', 'BotRequestController@getGamers');
+        Route::post('/saveTelegramData', 'BotRequestController@saveTelegramData');
+    });
+});

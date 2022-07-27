@@ -1,0 +1,94 @@
+'21:34:53'
+App\Models\User::__set_state(array(
+   'connection' => 'mysql',
+   'table' => 'users',
+   'primaryKey' => 'id',
+   'keyType' => 'int',
+   'incrementing' => true,
+   'with' => 
+  array (
+  ),
+   'withCount' => 
+  array (
+  ),
+   'preventsLazyLoading' => false,
+   'perPage' => 15,
+   'exists' => true,
+   'wasRecentlyCreated' => true,
+   'escapeWhenCastingToString' => false,
+   'attributes' => 
+  array (
+    'login' => 'kikara',
+    'password' => '$2y$10$RDw42WF5Z3sU4X1lVM6sZOgH1WifwmikZNg7ILtcgA7gmwYycyKDG',
+    'telegram_token' => 'Os6YEtryYlMFaLpT',
+    'updated_at' => '2022-07-27 21:34:53',
+    'created_at' => '2022-07-27 21:34:53',
+    'id' => 1,
+  ),
+   'original' => 
+  array (
+    'login' => 'kikara',
+    'password' => '$2y$10$RDw42WF5Z3sU4X1lVM6sZOgH1WifwmikZNg7ILtcgA7gmwYycyKDG',
+    'telegram_token' => 'Os6YEtryYlMFaLpT',
+    'updated_at' => '2022-07-27 21:34:53',
+    'created_at' => '2022-07-27 21:34:53',
+    'id' => 1,
+  ),
+   'changes' => 
+  array (
+  ),
+   'casts' => 
+  array (
+    'email_verified_at' => 'datetime',
+  ),
+   'classCastCache' => 
+  array (
+  ),
+   'attributeCastCache' => 
+  array (
+  ),
+   'dates' => 
+  array (
+  ),
+   'dateFormat' => NULL,
+   'appends' => 
+  array (
+  ),
+   'dispatchesEvents' => 
+  array (
+  ),
+   'observables' => 
+  array (
+  ),
+   'relations' => 
+  array (
+  ),
+   'touches' => 
+  array (
+  ),
+   'timestamps' => true,
+   'hidden' => 
+  array (
+    0 => 'password',
+    1 => 'remember_token',
+  ),
+   'visible' => 
+  array (
+  ),
+   'fillable' => 
+  array (
+    0 => 'login',
+    1 => 'telegram_token',
+    2 => 'name',
+    3 => 'email',
+    4 => 'password',
+    5 => 'avatar_path',
+  ),
+   'guarded' => 
+  array (
+    0 => '*',
+  ),
+   'rememberTokenName' => 'remember_token',
+   'accessToken' => NULL,
+))
+
