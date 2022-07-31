@@ -16,3 +16,5 @@ yarn-error.log
 /.vscode
 .composer.phar
 .error.log
+.log.log
+/public/log.log

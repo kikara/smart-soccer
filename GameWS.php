@@ -7,14 +7,14 @@ use Ratchet\Http\HttpServer;
 use Ratchet\WebSocket\WsServer;
 use App\Ratchet\GoalChat;
 
-
 $server = IoServer::factory(
     new HttpServer(
         new WsServer(
             new GoalChat()
         )
     ),
-    8081
+    8080
 );
 
+echo 'server run';
 $server->run();

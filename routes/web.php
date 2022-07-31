@@ -18,12 +18,15 @@ Route::get('/', function () {
 });
 
 Auth::routes();
-Route::get('/goalTest', function () {
-    return view('goal');
-});
+//Route::get('/goalTest', function () {
+//    return view('goal');
+//});
 
 Route::group(['namespace' => 'UserProfile'], function () {
     Route::get('/profile', 'UserProfileController@index')->name('profile');
 });
+Route::group(['namespace' => 'Game'], function() {
+    Route::get('/game', 'GameController@index')->name('game');
+});
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/home', 'HomeController@index')->name('home');

@@ -24,13 +24,20 @@ Route::group(['namespace' => 'Popup'], function () {
     });
 });
 
-Route::post('/getMainLayout', 'IndexController@getMainLayout');
-Route::post('/getMainInfo', 'IndexController@getMainInfo');
-
+Route::group(['namespace' => 'Game'], function () {
+    Route::post('/getMainLayout', 'GameController@getMainLayout');
+    Route::post('/getMainInfo', 'GameController@getMainInfo');
+    Route::post('/saveGame', 'GameController@saveGame');
+});
 
 Route::group(['namespace' => 'Bot'], function () {
     Route::prefix('/bot')->group(function () {
         Route::post('/getGamers', 'BotRequestController@getGamers');
         Route::post('/saveTelegramData', 'BotRequestController@saveTelegramData');
+        Route::post('/getGameSettings', 'BotRequestController@getGameSettings');
+        Route::post('/checkUser', 'BotRequestController@checkTelegramUser');
+        Route::post('/saveGameSettings', 'BotRequestController@saveGameSettings');
+        Route::post('/getGameSettingsById', 'BotRequestController@getGameSettingsById');
+        Route::post('/getUserIdByTelegramChatId', 'BotRequestController@getUserIdByTelegramChatId');
     });
 });

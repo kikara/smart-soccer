@@ -4,42 +4,90 @@ namespace App\Ratchet;
 
 class Game
 {
-    private int $blueCount = 0;
-    private int $redCount = 0;
-    private int $totalTime = 0;
+    public const TIME_DELAY = 10;
+    public const GAME_WIN_COUNT = 2;
+    public int $lastAccountedGoalBlue;
+    public int $lastAccountedGoalRed;
+
+    private \DateTime $dateTime;
+    private int $startGameTime = 0;
+    private int $endGameTime = 0;
+
+    private int $gameSettingTemplateID = 0;
+    private bool $isSideChange = false;
+    private string $mode = '';
+
+    private bool $isBusy = false;
     private bool $isGameStarted = false;
+    private bool $isGameOver = false;
 
-    private int $bluGamer = 0;
-    private int $redGamer = 0;
+    private int $winnerID = 0;
 
 
-    public static function newGame()
+    /**
+     * @var Round[]
+     */
+    private array $rounds = [];
+    private int $currentRound = 0;
+
+    public function __construct()
+    {
+        $this->lastAccountedGoalBlue = time();
+        $this->lastAccountedGoalRed = time();
+        $this->addRound(new Round());
+        $this->dateTime = new \DateTime();
+    }
+
+    public static function newGame(): Game
     {
         return new self();
     }
 
-    public function setGamers($blue, $red)
+    public function incrementIndexRound()
     {
-        $this->bluGamer = (int) $blue;
-        $this->redGamer = (int) $red;
+        $this->currentRound++;
+    }
+
+    public function addRound(Round $round)
+    {
+        $this->rounds[] = $round;
+    }
+
+    public function getCurrentRound()
+    {
+        return $this->rounds[$this->currentRound];
+    }
+
+    public function isRoundEnd(): bool
+    {
+        return $this->getCurrentRound()->getRoundEnd();
+    }
+
+    public function isSideChange(): bool
+    {
+        return $this->isSideChange;
     }
 
     public function incrementBlueTeam()
     {
-        $this->blueCount++;
+        $this->getCurrentRound()->incrementBlue();
     }
 
     public function incrementRedTeam()
     {
-        $this->redCount++;
+        $this->getCurrentRound()->incrementRed();
     }
 
-    public function startGame($message)
+    public function startGame()
     {
-        $msg = json_decode($message, true);
-        $this->bluGamer = (int) $msg['blue-gamer'];
-        $this->redGamer = (int) $msg['red-gamer'];
+        $this->startGameTime = time();
+        $this->dateTime->setTimestamp($this->startGameTime);
         $this->isGameStarted = true;
+    }
+
+    public function isGameStarted(): bool
+    {
+        return $this->isGameStarted;
     }
 
     public function stopGame()
@@ -47,21 +95,123 @@ class Game
         $this->isGameStarted = false;
     }
 
-    public function getState()
+    public function getState(): array
     {
-        return [
-            'blue' => $this->blueCount,
-            'red' => $this->redCount,
-            'total_time' => $this->totalTime,
+        $res = [
             'game_started' => $this->isGameStarted,
-            'blue_gamer' => $this->bluGamer,
-            'red_gamer' => $this->redGamer,
+            'mode' => $this->mode,
+            'is_busy' => $this->isBusy,
+            'start_time' => $this->startGameTime,
+            'current_round' => $this->currentRound,
+            'is_side_change' => $this->isSideChange,
+            'game_over' => $this->isGameOver,
+            'game_winner_id' => $this->winnerID,
+            'dateTime' => $this->dateTime->format('U'),
+            'round' => $this->getRoundState(),
+            'events' => $this->getEvents(),
         ];
+        if ($this->isGameOver) {
+            $res['total_time'] = $this->getTotalTime();
+            $res['rounds'] = $this->getRounds();
+            $res['template_id'] = $this->gameSettingTemplateID;
+        }
+        return $res;
+    }
+
+    public function setGameMode(string $mode)
+    {
+        $this->mode = $mode;
+    }
+
+    public function setSideChange()
+    {
+        $this->isSideChange = true;
     }
 
     public function reset()
     {
-        $this->blueCount = 0;
-        $this->redCount = 0;
+        $this->getCurrentRound()->reset();
+    }
+
+    public function setBusy()
+    {
+        $this->isBusy = true;
+    }
+
+    public function isBusy(): bool
+    {
+        return $this->isBusy;
+    }
+
+    private function getRoundState(): array
+    {
+        return $this->getCurrentRound()->getState();
+    }
+
+    public function isGameNotOver(): bool
+    {
+        return ! $this->isGameOver;
+    }
+
+    public function checkForGameOver()
+    {
+        if (count($this->rounds) >= self::GAME_WIN_COUNT) {
+            $gamersCountRound['blue'] = 0;
+            $gamersCountRound['red'] = 0;
+            $blueGamer = $this->getCurrentRound()->getBlueGamerID();
+            foreach ($this->rounds as $round) {
+                if ($blueGamer === $round->getWinnerID()) {
+                    $gamersCountRound['blue'] += 1;
+                } else {
+                    $gamersCountRound['red'] += 1;
+                }
+                if ($gamersCountRound['blue'] === self::GAME_WIN_COUNT) {
+                    $this->winnerID = $blueGamer;
+                    $this->gameOver();
+                    return;
+                }
+                if ($gamersCountRound['red'] === self::GAME_WIN_COUNT) {
+                    $this->winnerID = $this->getCurrentRound()->getRedGamerID();
+                    $this->gameOver();
+                    return;
+                }
+            }
+        }
+    }
+
+    public function setGameSettingTemplate($templateID)
+    {
+        $this->gameSettingTemplateID = (int) $templateID;
+    }
+
+    private function getRounds(): array
+    {
+        $result = [];
+        foreach ($this->rounds as $round) {
+            $result[] = $round->getState();
+        }
+        return $result;
+    }
+
+    private function gameOver()
+    {
+        $this->isGameOver = true;
+        $this->endGameTime = time();
+    }
+
+    private function getTotalTime(): int
+    {
+        return $this->endGameTime - $this->startGameTime;
+    }
+
+    private function getEvents()
+    {
+        if ($this->isGameStarted) {
+            $currentRound = $this->getCurrentRound()->getState();
+            if ($currentRound['blue_count'] === 0 && $currentRound['red_count'] === 0) {
+                return ['is_new_round' => true];
+            }
+        }
+        return [];
     }
 }
