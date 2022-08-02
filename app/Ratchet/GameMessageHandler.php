@@ -11,7 +11,7 @@ class GameMessageHandler
     private array $msg;
     private string $cmd;
     private Client $client;
-    private const HOST = 'http://192.168.1.30';
+    private const HOST = 'http://localhost';
 
     public function __construct($message)
     {

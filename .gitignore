@@ -15,6 +15,7 @@ yarn-error.log
 /.idea
 /.vscode
 .composer.phar
-.error.log
+error.log
 .log.log
 /public/log.log
+/public/js/app.js

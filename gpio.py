@@ -3,7 +3,7 @@ from time import sleep
 import asyncio
 from websockets import connect
 
-HOST = 'ws://192.168.1.30:8080'
+HOST = 'ws://localhost:8080'
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(23, GPIO.IN)

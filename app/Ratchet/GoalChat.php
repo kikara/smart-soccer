@@ -15,11 +15,13 @@ class GoalChat implements MessageComponentInterface
         $this->game = Game::newGame();
     }
 
-    public function onOpen(ConnectionInterface $conn) {
+    public function onOpen(ConnectionInterface $conn)
+    {
         $this->clients->attach($conn);
     }
 
-    public function onMessage(ConnectionInterface $from, $msg) {
+    public function onMessage(ConnectionInterface $from, $msg)
+    {
         $decoded = json_decode($msg, true);
         $callback = $this->getCallback($decoded['cmd']);
         $this->$callback($decoded);
@@ -29,11 +31,13 @@ class GoalChat implements MessageComponentInterface
         }
     }
 
-    public function onClose(ConnectionInterface $conn) {
+    public function onClose(ConnectionInterface $conn)
+    {
         $this->clients->detach($conn);
     }
 
-    public function onError(ConnectionInterface $conn, \Exception $e) {
+    public function onError(ConnectionInterface $conn, \Exception $e)
+    {
         $conn->close();
     }
 

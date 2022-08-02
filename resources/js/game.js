@@ -15,7 +15,7 @@ export default function Game() {
 
     this.tryToConnect = function () {
         try {
-            This.conn = new WebSocket('ws://192.168.1.30:8080');
+            This.conn = new WebSocket('ws://192.168.133.86:8080');
         } catch (e) {
             console.log('Соединение не установлено');
         }
