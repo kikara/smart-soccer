@@ -34,28 +34,31 @@ class BotRequestController extends Controller
             return ['data' => false];
         }
         $user = User::where('telegram_chat_id', $data['chat_id'])->first()?->toArray();
-        GameSettingTemplate::create([
+        $template = GameSettingTemplate::create([
             'mode' => $data['mode'] === 'pvp' ? GameSettingTemplate::PVP_MODE : GameSettingTemplate::TVT_MODE,
             'side' => $data['side'] === 'r' ? GameSettingTemplate::RED_SIDE : GameSettingTemplate::BLUE_SIDE,
             'side_change' => $data['change'] === 'y' ? 1 : 0,
             'user_id' => $user['id'],
         ]);
-        return ['data' => true];
+        return [
+            'data' => true,
+            'id' => $template->id
+        ];
     }
 
     public function getGameSettings()
     {
         $data = request()?->all();
-        custom_log($data, false);
         $telegramChatId = $data['chat_id'];
         $user = User::where('telegram_chat_id', $telegramChatId)->first()?->toArray();
-        $gameSetting = GameSettingTemplate::where('user_id', $user['id'])->first();
-        if (! $gameSetting) {
+        $gameSetting = GameSettingTemplate::where('user_id', $user['id'])->get()?->toArray();
+
+        if (empty($gameSetting)) {
             return ['data' => false];
         }
         return [
             'data' => true,
-            'settings' => $gameSetting->toArray()
+            'settings' => $gameSetting
         ];
     }
 
