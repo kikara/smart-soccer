@@ -32,28 +32,12 @@ class GameMessageHandler
         $game->getCurrentRound()->test();
     }
 
-    private function isTimeCheck(Game $game, string $side): bool
-    {
-        $now = time();
-        $lastTime = GameSettingTemplate::isBlueSide($side) ? $game->lastAccountedGoalBlue : $game->lastAccountedGoalRed;
-        $diff = $now - $lastTime;
-        if ($diff > Game::TIME_DELAY) {
-            if (GameSettingTemplate::isBlueSide($side)) {
-                $game->lastAccountedGoalBlue = $now;
-            } else {
-                $game->lastAccountedGoalRed = $now;
-            }
-            return true;
-        }
-        return false;
-    }
-
     private function incrementValue(Game $game)
     {
         if ($game->isGameStarted() && $game->isGameNotOver()) {
             if (! $game->isRoundEnd()) {
                 $callback = GameSettingTemplate::isBlueSide($this->msg['value']) ? 'incrementBlueTeam' : 'incrementRedTeam';
-                if ($this->isTimeCheck($game, $this->msg['value'])) {
+                if ($game->isTimeCheck($this->msg['value'])) {
                     $game->$callback();
                 }
             }
@@ -115,7 +99,7 @@ class GameMessageHandler
         $game->setGameSettingTemplate($this->msg['t_id']);
         $game->setGameMode($templateRow['mode']);
         $game->setBusy();
-
+        $this->setTableBusy($game, $fromUserID);
     }
 
     private function notFound(Game $game)
@@ -125,7 +109,7 @@ class GameMessageHandler
 
     private function getUserIdByTelegramChatId($chatId)
     {
-        $response = $this->client->post(self::HOST . '/api/bot/getUserIdByTelegramChatId', [
+        $response = $this->client->post($this->buildQuery('/api/bot/getUserIdByTelegramChatId'), [
             'form_params' => ['chat_id' => $chatId],
         ]);
 
@@ -138,7 +122,7 @@ class GameMessageHandler
 
     private function getTemplateRowById($templateID)
     {
-        $request = $this->client->post(self::HOST . '/api/bot/getGameSettingsById',[
+        $request = $this->client->post($this->buildQuery('/api/bot/getGameSettingsById'),[
             'form_params' => ['template_id' => $templateID],
         ]);
         if ($request->getStatusCode() !== 200) {
@@ -147,5 +131,26 @@ class GameMessageHandler
         $response = $request->getBody()->getContents();
         $jsonResponse = json_decode($response, true);
         return $jsonResponse['data'] ? $jsonResponse['settings'] : false;
+    }
+
+    private function setTableBusy(Game $game, $fromUserID)
+    {
+        $request = $this->client->post($this->buildQuery('/api/bot/setTableBusy'), [
+            'form_params' => ['user_id' => $fromUserID]
+        ]);
+        if ($request->getStatusCode() !== 200) {
+            return false;
+        }
+        $response = $request->getBody()->getContents();
+        $jsonResponse = json_decode($response, true);
+        if ($jsonResponse['data']) {
+            $game->setTableOccupationID($jsonResponse['table_occupation_id']);
+        }
+        return true;
+    }
+
+    private function buildQuery(string $uri): string
+    {
+        return self::HOST . $uri;
     }
 }

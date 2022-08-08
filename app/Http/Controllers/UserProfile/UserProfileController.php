@@ -4,6 +4,7 @@ namespace App\Http\Controllers\UserProfile;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class UserProfileController extends Controller
 {
@@ -25,5 +26,28 @@ class UserProfileController extends Controller
     public function index()
     {
         return view('user.profile');
+    }
+
+    public function saveProfile(Request $request)
+    {
+        if ($request->hasFile('avatar')) {
+            $path = $request->file('avatar')->store('avatars');
+        }
+        $validated = $request->validate([
+            'login' => 'required|min:6|max:255',
+            'name' => 'nullable|string|max:255',
+            'email' => 'nullable|email:rfc,dns'
+        ]);
+        $user = auth()->user();
+        $updateData = [
+            'login' => $validated['login'],
+            'name' => $validated['name'] ?? '',
+            'email' => $validated['email'] ?? '',
+        ];
+        if (isset($path)) {
+            $updateData['avatar_path'] = $path;
+        }
+        $user->update($updateData);
+        return redirect('profile');
     }
 }

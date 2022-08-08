@@ -24,6 +24,7 @@ Auth::routes();
 
 Route::group(['namespace' => 'UserProfile'], function () {
     Route::get('/profile', 'UserProfileController@index')->name('profile');
+    Route::post('/saveProfile', 'UserProfileController@saveProfile');
 });
 Route::group(['namespace' => 'Game'], function() {
     Route::get('/game', 'GameController@index')->name('game');

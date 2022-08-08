@@ -7,6 +7,7 @@ use App\Models\Game;
 use App\Models\GameRound;
 use App\Models\GameSettingTemplate;
 use App\Models\Round;
+use App\Models\TableOccupation;
 use App\Models\User;
 
 class GameController extends Controller
@@ -22,6 +23,7 @@ class GameController extends Controller
         $params['data'] = request()->all();
         $params['data']['blue_gamer_name'] = User::find($params['data']['round']['blue_gamer_id'])->toArray();
         $params['data']['red_gamer_name'] = User::find($params['data']['round']['red_gamer_id'])->toArray();
+        $params['data']['rounds_count'] = $this->countRounds($params['data']);
         return view('layouts.game_layout', $params);
     }
 
@@ -40,6 +42,7 @@ class GameController extends Controller
             return view('game.new_table');
         }
         $this->saveGameRounds($data);
+        $this->updateTableOccupation($data['table_occupation_id']);
         $params = $this->getLastGames();
         return view('game.new_table', $params);
     }
@@ -153,7 +156,7 @@ class GameController extends Controller
         return $this->setKeys($users, 'id');
     }
 
-    function secondsToArray(int $seconds)
+    private function secondsToArray(int $seconds)
     {
         $res = [];
         $res['hours'] = floor($seconds / 3600);
@@ -161,5 +164,27 @@ class GameController extends Controller
         $res['minutes'] = floor($seconds / 60);
         $res['secs'] = $seconds % 60;
         return $res;
+    }
+
+    private function updateTableOccupation($table_occupation_id)
+    {
+        $tableOccupation = TableOccupation::find($table_occupation_id);
+        $tableOccupation->update([
+            'end_game' => date('Y-m-d H:i:s')
+        ]);
+    }
+
+    private function countRounds(array $data)
+    {
+        $result =  [];
+        $result[$data['round']['blue_gamer_id']] = 0;
+        $result[$data['round']['red_gamer_id']] = 0;
+        foreach ($data['rounds'] as $round) {
+            $winnerID = $round['winner_id'];
+            if ($winnerID) {
+                $result[$round['winner_id']] += 1;
+            }
+        }
+        return $result;
     }
 }

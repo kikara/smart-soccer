@@ -39,5 +39,7 @@ Route::group(['namespace' => 'Bot'], function () {
         Route::post('/saveGameSettings', 'BotRequestController@saveGameSettings');
         Route::post('/getGameSettingsById', 'BotRequestController@getGameSettingsById');
         Route::post('/getUserIdByTelegramChatId', 'BotRequestController@getUserIdByTelegramChatId');
+        Route::post('/setTableBusy', 'BotRequestController@setTableBusy');
+        Route::post('/isTableOccupied', 'BotRequestController@isTableOccupied');
     });
 });

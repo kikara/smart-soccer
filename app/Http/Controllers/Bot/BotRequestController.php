@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Bot;
 
 
 use App\Models\GameSettingTemplate;
+use App\Models\TableOccupation;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -116,6 +117,36 @@ class BotRequestController extends Controller
                 'data' => true,
                 'user_id' => $user['id'],
             ];
+        }
+        return ['data' => false];
+    }
+
+    public function setTableBusy()
+    {
+        $data = request()?->all();
+        if (empty($data)) {
+            return ['data' => false];
+        }
+        $dateTime = new \DateTime();
+        $startGame = $dateTime->format('Y-m-d H:i:s');
+        $endGame = $dateTime->modify('+60 minutes')->format('Y-m-d H:i:s');
+        $tableOccupationID = TableOccupation::create([
+            'start_game' => $startGame,
+            'end_game' => $endGame,
+            'user_id' => $data['user_id']
+        ]);
+        return [
+            'data' => true,
+            'table_occupation_id' => $tableOccupationID->id,
+        ];
+    }
+
+    public function isTableOccupied(): array
+    {
+        $currentDateTime = date('Y-m-d H:i:s');
+        $rows = TableOccupation::where('end_game', '>=', $currentDateTime)->first()?->toArray();
+        if (empty($rows)) {
+            return ['data' => true];
         }
         return ['data' => false];
     }

@@ -2,6 +2,8 @@
 
 namespace App\Ratchet;
 
+use App\Models\GameSettingTemplate;
+
 class Game
 {
     public const TIME_DELAY = 10;
@@ -23,6 +25,7 @@ class Game
 
     private int $winnerID = 0;
 
+    private int $tableOccupationID = 0;
 
     /**
      * @var Round[]
@@ -109,11 +112,12 @@ class Game
             'dateTime' => $this->dateTime->format('U'),
             'round' => $this->getRoundState(),
             'events' => $this->getEvents(),
+            'rounds' => $this->getRounds(),
         ];
         if ($this->isGameOver) {
             $res['total_time'] = $this->getTotalTime();
-            $res['rounds'] = $this->getRounds();
             $res['template_id'] = $this->gameSettingTemplateID;
+            $res['table_occupation_id'] = $this->tableOccupationID;
         }
         return $res;
     }
@@ -213,5 +217,31 @@ class Game
             }
         }
         return [];
+    }
+
+    public function setTableOccupationID($id)
+    {
+        $this->tableOccupationID = (int) $id;
+    }
+
+    public function getTableOccupationID($id): int
+    {
+        return $this->tableOccupationID;
+    }
+
+    public function isTimeCheck(string $side): bool
+    {
+        $now = time();
+        $lastTime = GameSettingTemplate::isBlueSide($side) ? $this->lastAccountedGoalBlue : $this->lastAccountedGoalRed;
+        $diff = $now - $lastTime;
+        if ($diff > self::TIME_DELAY) {
+            if (GameSettingTemplate::isBlueSide($side)) {
+                $this->lastAccountedGoalBlue = $now;
+            } else {
+                $this->lastAccountedGoalRed = $now;
+            }
+            return true;
+        }
+        return false;
     }
 }

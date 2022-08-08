@@ -53,23 +53,12 @@ export default function Game() {
 
     this.onRoundEndSideChange = function (json) {
         let currentRound = parseInt(json['current_round']);
-        if (currentRound !== This.round && json['is_side_change']) {
-            let $firstCard = This.$container.find('.js-card-color-primary');
-            let $secCard = This.$container.find('.js-card-color-danger');
-            if ($firstCard.hasClass('bg-primary')) {
-                $firstCard.removeClass('bg-primary').addClass('bg-danger');
+        if (currentRound !== This.round) {
+            if (json['is_side_change']) {
+                This.updateContent(json);
             } else {
-                $firstCard.removeClass('bg-danger').addClass('bg-primary');
+                This.updateRoundCounts(json);
             }
-            if ($secCard.hasClass('bg-danger')) {
-                $secCard.removeClass('bg-danger').addClass('bg-primary');
-            } else {
-                $secCard.removeClass('bg-primary').addClass('bg-danger');
-            }
-            let $blueCount = This.$container.find('.js-blue-count');
-            let $redCount = This.$container.find('.js-red-count');
-            $blueCount.removeClass('js-blue-count').addClass('js-red-count');
-            $redCount.removeClass('js-red-count').addClass('js-blue-count');
             This.round = currentRound;
         }
     }
@@ -77,8 +66,7 @@ export default function Game() {
     this.onNewRound = function (json) {
         if (json['events']['is_new_round']) {
             let $audio = $('.js-audio-container').find('.js-audio');
-            $audio.trigger('play')
-            console.log($audio);
+            $audio.trigger('play');
         }
     }
 
@@ -100,14 +88,7 @@ export default function Game() {
                 This.$container.find('.js-blue-count').html(json['round']['blue_count']);
                 This.$container.find('.js-red-count').html(json['round']['red_count']);
             } else {
-                $.post(
-                    '/api/getMainLayout',
-                    json,
-                    function (response) {
-                        This.$container.html($(response).children());
-                        This.contentLoaded = true;
-                        This.onNewRound(json);
-                });
+                This.updateContent(json)
             }
         }
         if (json['game_started'] && ! json['game_over']) {
@@ -160,11 +141,31 @@ export default function Game() {
         This.conn.send(JSON.stringify(jsonData));
     }
 
-    This.alertMessage = function (msg) {
+    this.updateContent = function (json) {
+        $.post(
+            '/api/getMainLayout',
+            json,
+            function (response) {
+                This.$container.html($(response).children());
+                This.contentLoaded = true;
+                This.onNewRound(json);
+            });
+    }
+
+    this.alertMessage = function (msg) {
         $.alert({
             title: 'Ошибка',
             content: msg,
             type: 'red',
         });
+    }
+
+    this.updateRoundCounts = function (json) {
+        for (let item of json['rounds']) {
+            if (item['winner_id']) {
+                let card = This.$container.find('div[data-user='+ item['winner_id'] + ']');
+                card.find('.js-round-count').removeAttr('hidden');
+            }
+        }
     }
 }

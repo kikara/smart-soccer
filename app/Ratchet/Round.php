@@ -85,9 +85,4 @@ class Round
     {
         return $this->roundEnd;
     }
-
-    private function checkRoundEnd(int $count)
-    {
-        $this->roundEnd = $count === self::MAX_COUNT;
-    }
 }

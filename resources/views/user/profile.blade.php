@@ -4,7 +4,10 @@
 <div class="container">
     <div class="text-center">
         <div>
-            <img src="/img/avatar.png" alt="" style="width: 80px">
+            @php
+            $path = Auth::user()->avatar_path ? 'storage/' . Auth::user()->avatar_path : 'storage/avatar.png'
+            @endphp
+            <img src="{{ asset($path) }}" alt="" style="width: 80px" class="rounded-circle">
             <h2 class="mt-3">{{ Auth::user()->login }}</h2>
         </div>
     </div>
@@ -23,7 +26,8 @@
             <div class="card">
                 <div class="card-header">Настройки пользователя</div>
                 <div class="card-body">
-                    <form method="POST" action="/save_profile">
+                    <form method="POST" action="/saveProfile" enctype="multipart/form-data">
+                        @csrf
                         <div class="form-group">
                             <input type="text" class="form-control" placeholder="Логин" value="{{ Auth::user()->login }}" name="login">
                         </div>
@@ -36,7 +40,7 @@
                         </div>
 
                         <div class="mt-3">
-                            <input class="form-control" type="file" id="formFile">
+                            <input class="form-control" type="file" id="formFile" name="avatar">
                         </div>
 
                         <div class="d-flex mt-3">
@@ -49,14 +53,23 @@
                                         </div>
                                     </div>
                                 </div>
-                            @else
+                            @endif
                                 <div class="form-group col-3 d-flex align-items-center">
-                                    <a href="https://telegram.me/SmartSoccerBot?start={{ Auth::user()->telegram_token }}" class="btn btn-primary" target="__blank">
+                                    <a href="https://telegram.me/SmartSoccerBot?start={{ Auth::user()->telegram_token }}"
+                                       class="btn btn-primary ms-3" target="__blank">
                                         Привязать Telegram
                                     </a>
                                 </div>
-                            @endif
                         </div>
+                        @if ($errors->any())
+                            <div class="alert alert-danger mt-3">
+                                <ul>
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
 
                         <button type="submit" class="btn btn-success mt-5">Сохранить</button>
                     </form>
