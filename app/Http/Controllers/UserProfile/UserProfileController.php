@@ -30,14 +30,15 @@ class UserProfileController extends Controller
 
     public function saveProfile(Request $request)
     {
-        if ($request->hasFile('avatar')) {
-            $path = $request->file('avatar')->store('avatars');
-        }
         $validated = $request->validate([
             'login' => 'required|min:6|max:255',
             'name' => 'nullable|string|max:255',
-            'email' => 'nullable|email:rfc,dns'
+            'email' => 'nullable|email:rfc,dns',
+            'avatar' => 'file|size:1024',
         ]);
+        if ($request->hasFile('avatar')) {
+            $path = $request->file('avatar')->store('avatars');
+        }
         $user = auth()->user();
         $updateData = [
             'login' => $validated['login'],
