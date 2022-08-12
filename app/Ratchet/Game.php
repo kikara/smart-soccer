@@ -56,7 +56,7 @@ class Game
         $this->rounds[] = $round;
     }
 
-    public function getCurrentRound()
+    public function getCurrentRound(): Round
     {
         return $this->rounds[$this->currentRound];
     }
@@ -210,13 +210,7 @@ class Game
 
     private function getEvents()
     {
-        if ($this->isGameStarted) {
-            $currentRound = $this->getCurrentRound()->getState();
-            if ($currentRound['blue_count'] === 0 && $currentRound['red_count'] === 0) {
-                return ['is_new_round' => true];
-            }
-        }
-        return [];
+        return GameEvents::getGameEvents($this);
     }
 
     public function setTableOccupationID($id)

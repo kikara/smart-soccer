@@ -2,7 +2,10 @@
 
 @section('content')
     <script>
-        conn = new WebSocket('ws://192.168.1.30:8080');
+        conn = new WebSocket('ws://192.168.133.86:8080');
+        conn.onopen = function (e) {
+            console.log('Соединение установлено')
+        }
         conn.onmessage = function (e) {
             console.log(e.data)
         }

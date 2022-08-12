@@ -97,7 +97,7 @@ class GameController extends Controller
 
     private function getLastGames()
     {
-        $result['games'] = Game::limit(10)->get()->toArray();
+        $result['games'] = Game::limit(10)->orderByDesc('id')->get()->toArray();
         $gamesID = [];
         $userID = [];
         foreach ($result['games'] as $game) {

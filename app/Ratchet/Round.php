@@ -9,16 +9,23 @@ class Round
     private int $blueCount = 0;
     private int $redCount = 0;
 
-    private int $bluGamerID = 0;
+    private int $blueGamerID = 0;
     private int $redGamerID = 0;
 
     private int $winnerID = 0;
 
     private bool $roundEnd = false;
 
+    public GoalTrack $goalTrack;
+
+    public function __construct()
+    {
+        $this->goalTrack = new GoalTrack();
+    }
+
     public function setGamers($blue, $red)
     {
-        $this->bluGamerID = (int) $blue;
+        $this->blueGamerID = (int) $blue;
         $this->redGamerID = (int) $red;
     }
 
@@ -29,7 +36,7 @@ class Round
 
     public function getBlueGamerID(): int
     {
-        return $this->bluGamerID;
+        return $this->blueGamerID;
     }
 
     public function getRedGamerID(): int
@@ -39,11 +46,12 @@ class Round
 
     public function incrementBlue()
     {
+        $this->goalTrack->updateScore($this->blueGamerID, $this->redGamerID);
         if ($this->blueCount < self::MAX_COUNT) {
             $this->blueCount++;
         }
         if ($this->blueCount === self::MAX_COUNT) {
-            $this->winnerID = $this->bluGamerID;
+            $this->winnerID = $this->blueGamerID;
             $this->roundEnd = true;
         }
     }
@@ -55,6 +63,7 @@ class Round
 
     public function incrementRed()
     {
+        $this->goalTrack->updateScore($this->redGamerID, $this->blueGamerID);
         if ($this->redCount < self::MAX_COUNT) {
             $this->redCount++;
         }
@@ -73,7 +82,7 @@ class Round
     public function getState(): array
     {
         return [
-            'blue_gamer_id' => $this->bluGamerID,
+            'blue_gamer_id' => $this->blueGamerID,
             'red_gamer_id' => $this->redGamerID,
             'blue_count' => $this->blueCount,
             'red_count' => $this->redCount,

@@ -10,7 +10,7 @@
         <script>
             document.addEventListener('DOMContentLoaded', (e) => {
                 game.init();
-                game.startPageForm();
+                console.log('hello');
             });
         </script>
     </head>

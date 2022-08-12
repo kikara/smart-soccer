@@ -1,7 +1,10 @@
+import AudioEventHandler from "./audioEventHandler";
+
 export default function Game() {
     let This = this;
 
     this.init = function () {
+        This.audioEventHandler = new AudioEventHandler();
         This.$container = $('.js-container');
         This.startTime = 0;
         This.round = 0;
@@ -15,7 +18,7 @@ export default function Game() {
 
     this.tryToConnect = function () {
         try {
-            This.conn = new WebSocket('ws://192.168.1.30:8080');
+            This.conn = new WebSocket('ws://192.168.133.86:8080');
         } catch (e) {
             console.log('Соединение не установлено');
         }
@@ -48,7 +51,7 @@ export default function Game() {
         This.onGameStarted(json);
         This.onRoundEndSideChange(json);
         This.onGameOver(json);
-        This.onNewRound(json);
+        This.audioEventHandler.handleEvent(json);
     }
 
     this.onRoundEndSideChange = function (json) {
@@ -60,13 +63,6 @@ export default function Game() {
                 This.updateRoundCounts(json);
             }
             This.round = currentRound;
-        }
-    }
-
-    this.onNewRound = function (json) {
-        if (json['events']['is_new_round']) {
-            let $audio = $('.js-audio-container').find('.js-audio');
-            $audio.trigger('play');
         }
     }
 
@@ -132,13 +128,11 @@ export default function Game() {
     }
 
     this.getGameState = function () {
-        let jsonData = {'cmd': 'state'};
-        This.conn.send(JSON.stringify(jsonData));
+        This.conn.send(JSON.stringify({'cmd': 'state'}));
     }
 
     this.sendToNewGame = function () {
-        let jsonData = {'cmd': 'new_game'};
-        This.conn.send(JSON.stringify(jsonData));
+        This.conn.send(JSON.stringify({'cmd': 'new_game'}));
     }
 
     this.updateContent = function (json) {
@@ -148,16 +142,7 @@ export default function Game() {
             function (response) {
                 This.$container.html($(response).children());
                 This.contentLoaded = true;
-                This.onNewRound(json);
             });
-    }
-
-    this.alertMessage = function (msg) {
-        $.alert({
-            title: 'Ошибка',
-            content: msg,
-            type: 'red',
-        });
     }
 
     this.updateRoundCounts = function (json) {

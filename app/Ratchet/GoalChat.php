@@ -26,8 +26,12 @@ class GoalChat implements MessageComponentInterface
         $callback = $this->getCallback($decoded['cmd']);
         $this->$callback($decoded);
         $encoded = json_encode($this->game->getState());
-        foreach ($this->clients as $client) {
-            $client->send($encoded);
+        if ($this->isGetStateCmd($decoded['cmd'])) {
+            $from->send($encoded);
+        } else {
+            foreach ($this->clients as $client) {
+                $client->send($encoded);
+            }
         }
     }
 
@@ -55,5 +59,10 @@ class GoalChat implements MessageComponentInterface
     {
         $callbacks = ['new_game' => 'createNewGame'];
         return $callbacks[$cmd] ?? 'handle';
+    }
+
+    private function isGetStateCmd($cmd): bool
+    {
+        return $cmd === 'state';
     }
 }

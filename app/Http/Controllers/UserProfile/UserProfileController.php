@@ -34,7 +34,7 @@ class UserProfileController extends Controller
             'login' => 'required|min:6|max:255',
             'name' => 'nullable|string|max:255',
             'email' => 'nullable|email:rfc,dns',
-            'avatar' => 'file|size:1024',
+            'avatar' => 'file',
         ]);
         if ($request->hasFile('avatar')) {
             $path = $request->file('avatar')->store('avatars');
