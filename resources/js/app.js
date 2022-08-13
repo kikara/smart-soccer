@@ -1,6 +1,12 @@
-import './bootstrap';
-import AudioEventHandler from "./audioEventHandler";
-import Game from './game.js';
 import $ from 'jquery';
+global.$ = global.jQuery = $;
+
+require('bootstrap');
+
+import './bootstrap';
+
+import Game from './game.js';
 window.game = new Game();
-window.$ = window.jQuery = $;
+
+require('./tournament/Tournament');
+
