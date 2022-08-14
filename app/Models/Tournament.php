@@ -17,4 +17,9 @@ class Tournament extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function players() : Relation
+    {
+        return $this->belongsToMany(User::class);
+    }
 }

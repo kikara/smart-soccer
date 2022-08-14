@@ -37,5 +37,11 @@ Route::group(['namespace' => 'Tournaments'], function() {
         Route::get('/', 'TournamentController@all')->name('tournaments_all');
         Route::get('/add', 'TournamentController@createPage')->name('tournament_add');
         Route::post('/add', 'TournamentController@add')->name('tournament_add');
+        Route::get('/{id}', 'TournamentController@get')->where('id', '[0-9]+')->name('tournament_get');
+
+        Route::prefix('/participation')->group(function() {
+            Route::post('/add/', 'ParticipationController@add')->name('participation_add');
+            Route::post('/remove/', 'ParticipationController@remove')->name('participation_remove');
+        });
     });
 });

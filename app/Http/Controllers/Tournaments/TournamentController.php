@@ -49,4 +49,13 @@ class TournamentController extends Controller
                 ->send();
         }
     }
+
+    public function get(int $id) : View
+    {
+        $tournament = Tournament::find($id);
+
+        return view('tournaments.get', [
+            'tournament' => $tournament,
+        ]);
+    }
 }
