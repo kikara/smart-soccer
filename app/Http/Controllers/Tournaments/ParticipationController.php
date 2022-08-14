@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Tournaments;
 
 use App\Http\Controllers\Controller;
-use App\Models\Tournament;
+use App\Models\Tournaments\Tournament;
 use App\Services\Tournament\Participation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;

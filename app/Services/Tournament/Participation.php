@@ -2,7 +2,7 @@
 
 namespace App\Services\Tournament;
 
-use App\Models\Tournament;
+use App\Models\Tournaments\Tournament;
 
 class Participation
 {

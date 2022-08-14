@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Tournaments;
 
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -21,5 +21,15 @@ class Tournament extends Model
     public function players() : Relation
     {
         return $this->belongsToMany(User::class);
+    }
+
+    public function games() : Relation
+    {
+        return $this->hasMany(TournamentTable::class);
+    }
+
+    public function status() : Relation
+    {
+        return $this->belongsTo(TournamentStatus::class, 'tournament_status_id');
     }
 }

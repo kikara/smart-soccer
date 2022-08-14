@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Tournaments\Tournament;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Foundation\Auth\User as Authenticatable;

@@ -3,12 +3,11 @@
 namespace App\Http\Controllers\Tournaments;
 
 use App\Http\Controllers\Controller;
-use App\Models\Tournament;
+use App\Models\Tournaments\Tournament;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
-use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\Response;
 
 class TournamentController extends Controller
 {
@@ -26,6 +25,7 @@ class TournamentController extends Controller
 
     public function add(
         Request $request,
+        \App\Services\Tournament\Tournament $tournament,
     ) : Response
     {
         try {
@@ -33,11 +33,11 @@ class TournamentController extends Controller
                 'name' => 'required',
                 'tournament_start' => 'required|date|after:now'
             ]);
-            $tournament = new Tournament();
-            $tournament->setAttribute('name', $request->input('name'));
-            $tournament->setAttribute('tournament_start', $request->input('tournament_start'));
-            $tournament->setAttribute('user_id', Auth::user()->getAuthIdentifier());
-            $tournament->save();
+            $tournament->create(
+                $request->request->get('name'),
+                $request->request->get('tournament_start'),
+                Auth::id(),
+            );
             return \response()
                 ->json(['res' => true])
                 ->setStatusCode(Response::HTTP_CREATED)
