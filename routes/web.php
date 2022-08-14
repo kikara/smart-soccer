@@ -36,6 +36,6 @@ Route::group(['namespace' => 'Tournaments'], function() {
     Route::prefix('/tournaments')->group(function() {
         Route::get('/', 'TournamentController@all')->name('tournaments_all');
         Route::get('/add', 'TournamentController@createPage')->name('tournament_add');
-        Route::post('/add', 'TournamentController@createPage')->name('tournament_add');
+        Route::post('/add', 'TournamentController@add')->name('tournament_add');
     });
 });

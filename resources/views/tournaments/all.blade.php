@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="btn btn-outline-primary float-end" id="tournamentCreate">
+    <div class="btn btn-outline-primary float-end" id="tournamentCreateForm">
         Создать турнир
     </div>
 
@@ -15,7 +15,7 @@
             <tr>
                 <td>{{ $tournament->name }}</td>
                 <td>{{ $tournament->tournament_start }}</td>
-                <td>{{ $tournament->creator->login }}</td>
+                <td>{{ $tournament->user->login }}</td>
             </tr>
         @endforeach
     </table>

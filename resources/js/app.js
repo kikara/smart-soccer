@@ -8,5 +8,6 @@ import './bootstrap';
 import Game from './game.js';
 window.game = new Game();
 
-require('./tournament/Tournament');
+import {Tournament} from "./tournament/Tournament";
+new Tournament();
 
