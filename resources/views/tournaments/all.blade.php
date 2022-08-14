@@ -15,7 +15,7 @@
             <tr>
                 <td>{{ $tournament->name }}</td>
                 <td>{{ $tournament->tournament_start }}</td>
-                <td>{{ $tournament->creator->login }}</td>
+{{--                <td>{{ $tournament->creator->login }}</td>--}}
             </tr>
         @endforeach
     </table>
