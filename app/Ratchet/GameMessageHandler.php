@@ -61,6 +61,9 @@ class GameMessageHandler
                 }
             }
         }
+        if ($game->isGameOver()) {
+            $this->sendToSaveGame($game);
+        }
     }
 
     private function reset(Game $game)
@@ -152,5 +155,16 @@ class GameMessageHandler
     private function buildQuery(string $uri): string
     {
         return self::HOST . $uri;
+    }
+
+    private function sendToSaveGame(Game $game)
+    {
+        $request = $this->client->post($this->buildQuery('/api/socket/saveGame'), [
+            'form_params' => $game->getState()
+        ]);
+        if ($request->getStatusCode() !== 200) {
+            return false;
+        }
+        return true;
     }
 }

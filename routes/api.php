@@ -27,7 +27,7 @@ Route::group(['namespace' => 'Popup'], function () {
 Route::group(['namespace' => 'Game'], function () {
     Route::post('/getMainLayout', 'GameController@getMainLayout');
     Route::post('/getMainInfo', 'GameController@getMainInfo');
-    Route::post('/saveGame', 'GameController@saveGame');
+    Route::post('/getNewTableLayout', 'GameController@getNewTableLayout');
 });
 
 Route::group(['namespace' => 'Bot'], function () {
@@ -41,5 +41,11 @@ Route::group(['namespace' => 'Bot'], function () {
         Route::post('/getUserIdByTelegramChatId', 'BotRequestController@getUserIdByTelegramChatId');
         Route::post('/setTableBusy', 'BotRequestController@setTableBusy');
         Route::post('/isTableOccupied', 'BotRequestController@isTableOccupied');
+    });
+});
+
+Route::group(['namespace' => 'Websocket'], function () {
+    Route::prefix('/socket')->group(function () {
+        Route::post('/saveGame', 'WebsocketRequestController@saveGame');
     });
 });

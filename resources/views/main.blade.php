@@ -2,12 +2,12 @@
 
 @section('content')
     <script>
-        conn = new WebSocket('ws://192.168.133.86:8080');
+        conn = new WebSocket(WS_HOST);
         conn.onopen = function (e) {
-            console.log('Соединение установлено')
+            console.log('Соединение установлено');
         }
         conn.onmessage = function (e) {
-            console.log(e.data)
+            console.log(e.data);
         }
     </script>
     <div class="container js-container">
