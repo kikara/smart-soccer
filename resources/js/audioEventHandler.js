@@ -26,19 +26,22 @@ export default function AudioEventHandler() {
 
     this.onRoundOne = function () {
         if (This.state['current_round'] === 0) {
-            console.log('this is 1 round');
+            let audio = document.getElementById('js-first-round');
+            audio.play();
         }
     }
 
     this.onRoundTwo = function () {
         if (This.state['current_round'] === 1) {
-            console.log('this is 2 round');
+            let audio = document.getElementById('js-second-round');
+            audio.play();
         }
     }
 
     this.onRoundThree = function () {
         if (This.state['current_round'] === 2) {
-            console.log('this is 3 round');
+            let audio = document.getElementById('js-final-round');
+            audio.play();
         }
     }
 

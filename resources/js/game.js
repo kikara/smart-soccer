@@ -51,7 +51,9 @@ export default function Game() {
         This.onGameStarted(json);
         This.onRoundEndSideChange(json);
         This.onGameOver(json);
-        This.audioEventHandler.handleEvent(json);
+        if (This.contentLoaded) {
+            This.audioEventHandler.handleEvent(json);
+        }
     }
 
     this.onRoundEndSideChange = function (json) {
