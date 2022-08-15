@@ -21,6 +21,4 @@ error.log
 /public/js/*
 /public/css/*
 
-/docker-compose.yml
-/.docker/
 /.env
