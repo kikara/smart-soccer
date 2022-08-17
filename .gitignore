@@ -19,3 +19,5 @@ error.log
 .log.log
 /public/log.log
 /public/audio
+/mariadb-data
+/pma-data
