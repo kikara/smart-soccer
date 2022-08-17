@@ -13,9 +13,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('main');
-});
+Route::get('/', 'IndexController@index');
 
 Auth::routes();
 //Route::get('/goalTest', function () {
