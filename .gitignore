@@ -20,3 +20,5 @@ error.log
 /public/log.log
 /public/js/app.js
 /public/audio
+/mariadb-data
+/pma-data
