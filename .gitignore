@@ -18,6 +18,4 @@ yarn-error.log
 error.log
 .log.log
 /public/log.log
-/public/js/app.js
 /public/audio
-/public/css/
