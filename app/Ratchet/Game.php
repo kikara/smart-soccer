@@ -188,6 +188,11 @@ class Game
         $this->gameSettingTemplateID = (int) $templateID;
     }
 
+    public function isGameOver(): bool
+    {
+        return $this->isGameOver;
+    }
+
     private function getRounds(): array
     {
         $result = [];

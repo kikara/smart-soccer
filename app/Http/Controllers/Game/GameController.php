@@ -35,69 +35,15 @@ class GameController extends Controller
         return $data;
     }
 
-    public function saveGame()
+    public function getNewTableLayout()
     {
-        $data = request()?->all();
-        if (empty($data)) {
-            return view('game.new_table');
-        }
-        $this->saveGameRounds($data);
-        $this->updateTableOccupation($data['table_occupation_id']);
         $params = $this->getLastGames();
         return view('game.new_table', $params);
     }
 
-    private function saveGameRounds(array $data)
-    {
-        $rounds = $data['rounds'];
-        $firstRound = $rounds[0];
-        $dateTime = new \DateTime;
-        $date = $dateTime->setTimestamp((int) $data['dateTime'])->format('Y-m-d H:i:s');
-
-        $game = Game::create([
-            'gamerOne' => $firstRound['blue_gamer_id'],
-            'gamerTwo' => $firstRound['red_gamer_id'],
-            'winner' => $data['game_winner_id'],
-            'totalTime' => $data['total_time'],
-            'gameSettingTemplateId' => $data['template_id'],
-            'dateTime' => $date,
-        ]);
-        $gameID = $game->id;
-        $number = 1;
-        $isSideChange = $data['is_side_change'] === 'true';
-        foreach ($data['rounds'] as $round) {
-            if ($number == 2 && $isSideChange) {
-                $gamerOne = $round['red_gamer_id'];
-                $gamerTwo = $round['blue_gamer_id'];
-                $countOne = $round['red_count'];
-                $countTwo = $round['blue_count'];
-            } else {
-                $gamerOne = $round['blue_gamer_id'];
-                $gamerTwo = $round['red_gamer_id'];
-                $countOne = $round['blue_count'];
-                $countTwo = $round['red_count'];
-            }
-            $roundModel = Round::create([
-                'number' => $number,
-                'gamerOne' => $gamerOne,
-                'gamerTwo' => $gamerTwo,
-                'countOne' => $countOne,
-                'countTwo' => $countTwo,
-                'winner' => $round['winner_id'],
-                'totalTime' => 0,
-            ]);
-
-            GameRound::create([
-                'gameId' => $gameID,
-                'roundId' => $roundModel->id,
-            ]);
-            $number++;
-        }
-    }
-
     private function getLastGames()
     {
-        $result['games'] = Game::limit(10)->orderByDesc('id')->get()->toArray();
+        $result['games'] = Game::limit(10)->orderBy('id', 'ASC')->get()->toArray();
         $gamesID = [];
         $userID = [];
         foreach ($result['games'] as $game) {
@@ -164,14 +110,6 @@ class GameController extends Controller
         $res['minutes'] = floor($seconds / 60);
         $res['secs'] = $seconds % 60;
         return $res;
-    }
-
-    private function updateTableOccupation($table_occupation_id)
-    {
-        $tableOccupation = TableOccupation::find($table_occupation_id);
-        $tableOccupation->update([
-            'end_game' => date('Y-m-d H:i:s')
-        ]);
     }
 
     private function countRounds(array $data)

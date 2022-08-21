@@ -77,7 +77,7 @@ class BotRequestController extends Controller
     {
         $data = request()?->all();
         $chatId = $data['chat_id'];
-        $users = User::where('telegram_chat_id', '!=', $chatId)->get()->toArray();
+        $users = User::where('telegram_chat_id', '!=', $chatId)->where('telegram_chat_id', '!=', '')->get()->toArray();
         $resultData = [];
         foreach ($users as $user) {
             $resultData[] = [

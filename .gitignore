@@ -20,5 +20,6 @@ error.log
 /public/log.log
 /public/js/*
 /public/css/*
-
 /.env
+/mariadb-data
+/pma-data

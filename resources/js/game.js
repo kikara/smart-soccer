@@ -18,7 +18,7 @@ export default function Game() {
 
     this.tryToConnect = function () {
         try {
-            This.conn = new WebSocket('ws://192.168.133.86:8080');
+            This.conn = new WebSocket(WS_HOST);
         } catch (e) {
             console.log('Соединение не установлено');
         }
@@ -51,7 +51,9 @@ export default function Game() {
         This.onGameStarted(json);
         This.onRoundEndSideChange(json);
         This.onGameOver(json);
-        This.audioEventHandler.handleEvent(json);
+        if (This.contentLoaded) {
+            This.audioEventHandler.handleEvent(json);
+        }
     }
 
     this.onRoundEndSideChange = function (json) {
@@ -104,8 +106,8 @@ export default function Game() {
                 This.timerOn = false;
             }
             $.post(
-                '/api/saveGame',
-                json,
+                '/api/getNewTableLayout',
+                {},
                 function (response) {
                     This.$container.html($(response).children());
             });
