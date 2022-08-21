@@ -24,6 +24,8 @@ services:
         depends_on:
             - db
         container_name: soccer_app
+        ports:
+            - "8776:8080"
 
     db:
         image: mariadb
