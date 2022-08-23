@@ -43,7 +43,10 @@ class GameController extends Controller
 
     private function getLastGames()
     {
-        $result['games'] = Game::limit(10)->orderBy('id', 'ASC')->get()->toArray();
+        $result['games'] = Game::limit(10)->orderBy('id', 'DESC')->get()?->toArray();
+        if (! empty($result['games'])) {
+            $result['games'] = array_reverse($result['games']);
+        }
         $gamesID = [];
         $userID = [];
         foreach ($result['games'] as $game) {
