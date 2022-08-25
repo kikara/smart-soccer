@@ -69,9 +69,5 @@
             </div>
         </div>
     </div>
-    <div class="row js-audio-container">
-        <audio src="/audio/round_1.mp3" class="js-audio" type="audio/mpeg">
-        </audio>
-    </div>
 </div>
 
