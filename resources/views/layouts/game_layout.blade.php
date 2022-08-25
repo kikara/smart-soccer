@@ -1,13 +1,13 @@
 <div class="container js-container">
     <div class="audio-sys-container">
         <audio id="js-first-round">
-            <source src="{{ asset('/storage/audio/system/round_1_fight.mp3') }}" type="audio/mpeg">
+            <source src="{{ asset('/audio/round_1_fight.mp3') }}" type="audio/mpeg">
         </audio>
         <audio id="js-second-round">
-            <source src="{{ asset('/storage/audio/system/round_2_fight.mp3') }}" type="audio/mpeg">
+            <source src="{{ asset('/audio/round_2_fight.mp3') }}" type="audio/mpeg">
         </audio>
         <audio id="js-final-round">
-            <source src="{{ asset('/storage/audio/system/final_round_fight.mp3') }}" type="audio/mpeg">
+            <source src="{{ asset('/audio/final_round_fight.mp3') }}" type="audio/mpeg">
         </audio>
         <audio id="js-goal">
             <source src="{{ asset('/audio/goal.mp3') }}" type="audio/mpeg">
