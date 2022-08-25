@@ -178,7 +178,6 @@ export default function Game() {
             'liu-kang-kick.mp3', 'delo-sdelano.mp3', 'meme-de-creditos-finales.mp3',
             'cr_suuu.mp3', 'mario-meme.mp3', 'hallelujahshort.mp3', 'that_was_easy.mp3'];
         let file = files[Math.floor(Math.random() * files.length)];
-        console.log('random file', file);
         return '/audio/' + file;
     }
 }
