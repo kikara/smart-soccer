@@ -163,8 +163,22 @@ export default function Game() {
         let currentRedCount = parseInt(This.$container.find('.js-red-count').html());
         console.log(round['blue_count']);
         if (currentRedCount !== parseInt(round['red_count']) || currentBlueCount !== parseInt(round['blue_count'])) {
-            let audio = document.getElementById('js-goal');
+            // let audio = document.getElementById('js-goal');
+            let audio = new Audio(This.getRandomAudioFile());
+            audio.addEventListener('loadeddata', function () {
+                audio.play();
+            }, false);
             audio.play();
         }
+    }
+
+    this.getRandomAudioFile = function () {
+        let files = [
+            'goal.mp3', 'icq.mp3', 'finish-him.mp3',
+            'liu-kang-kick.mp3', 'delo-sdelano.mp3', 'meme-de-creditos-finales.mp3',
+            'cr_suuu.mp3', 'mario-meme.mp3', 'hallelujahshort.mp3', 'that_was_easy.mp3'];
+        let file = files[Math.floor(Math.random() * files.length)];
+        console.log('random file', file);
+        return '/audio/' + file;
     }
 }
