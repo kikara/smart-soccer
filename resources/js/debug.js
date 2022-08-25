@@ -18,6 +18,10 @@ export default function Debug () {
 
     this.buttons = function () {
         This.onPrepareGame();
+        This.onStartGame();
+        This.onRedGoalButton();
+        This.onBlueGoalButton();
+        This.onTestGoalButton();
     }
 
     this.tryToConnect = function () {
@@ -62,6 +66,40 @@ export default function Debug () {
                 'r': '5422355155',
                 't_id': '1',
             }
+            This.send(data);
+        });
+    }
+
+    this.onStartGame = function () {
+        This.$container.on('click', '.js-start', function () {
+            let data = {'cmd': 'start'}
+            This.send(data);
+        });
+    }
+
+    this.onBlueGoalButton = function () {
+        This.$container.on('click', '.js-blue', function () {
+            let data = {
+                'cmd': 'count',
+                'value': 'blue',
+            }
+            This.send(data);
+        });
+    }
+
+    this.onRedGoalButton = function () {
+        This.$container.on('click', '.js-red', function () {
+            let data = {
+                'cmd': 'count',
+                'value': 'red'
+            }
+            This.send(data);
+        });
+    }
+
+    this.onTestGoalButton = function () {
+        This.$container.on('click', '.js-test', function () {
+            let data = {'cmd': 'test'}
             This.send(data);
         });
     }

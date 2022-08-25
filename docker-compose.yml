@@ -11,6 +11,7 @@ services:
             - ./.docker/nginx/conf.d:/etc/nginx/conf.d
         depends_on:
             - php
+        container_name: soccer_nginx
 
     php:
         build: ./.docker/php
