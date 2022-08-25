@@ -82,11 +82,10 @@ export default function Game() {
 
     this.onGameStarted = function (json) {
         if (json['is_busy']) {
-            let audio = document.getElementById('js-goal');
             if (This.contentLoaded) {
+                This.goalAudioPlay(json);
                 This.$container.find('.js-blue-count').html(json['round']['blue_count']);
                 This.$container.find('.js-red-count').html(json['round']['red_count']);
-                audio.play();
             } else {
                 This.updateContent(json)
             }
@@ -155,6 +154,17 @@ export default function Game() {
                 let card = This.$container.find('div[data-user='+ item['winner_id'] + ']');
                 card.find('.js-round-count').removeAttr('hidden');
             }
+        }
+    }
+
+    this.goalAudioPlay = function (json) {
+        let round = json['round'];
+        let currentBlueCount = parseInt(This.$container.find('.js-blue-count').html());
+        let currentRedCount = parseInt(This.$container.find('.js-red-count').html());
+        console.log(round['blue_count']);
+        if (currentRedCount !== parseInt(round['red_count']) || currentBlueCount !== parseInt(round['blue_count'])) {
+            let audio = document.getElementById('js-goal');
+            audio.play();
         }
     }
 }
