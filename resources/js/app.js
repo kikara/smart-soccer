@@ -11,3 +11,4 @@ global.SoundSetting = SoundSetting;
 require('./tournament/Tournament');
 require('bootstrap');
 require('./config');
+require('jquery-confirm');
