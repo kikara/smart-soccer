@@ -26,6 +26,8 @@ Route::group(['namespace' => 'UserProfile'], function () {
         Route::get('/sound_settings', 'UserProfileController@sounds')->name('sound_settings');
         Route::post('/save_single_sound', 'UserProfileController@saveGoalSound');
         Route::post('/delete_single_audio', 'UserProfileController@deleteSingleAudio');
+        Route::post('/save_event', 'UserProfileController@saveEvent');
+        Route::post('/event_delete', 'UserProfileController@eventDelete');
     });
     Route::post('/saveProfile', 'UserProfileController@saveProfile');
 });

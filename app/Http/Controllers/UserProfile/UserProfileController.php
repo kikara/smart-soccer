@@ -3,10 +3,14 @@
 namespace App\Http\Controllers\UserProfile;
 
 use App\Http\Controllers\Controller;
+use App\Models\EventParam;
+use App\Models\Events;
+use App\Models\UserAudioEvent;
 use App\Models\UserSingleAudio;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 
 class UserProfileController extends Controller
 {
@@ -56,8 +60,38 @@ class UserProfileController extends Controller
 
     public function sounds()
     {
-        $params['userSounds'] = UserSingleAudio::where('user_id', '=', Auth()->user()->id)->get()?->toArray() ?? [];
+        $userId = Auth()->user()->id;
+        $params['userSounds'] = UserSingleAudio::where('user_id', '=', $userId)->get()?->toArray() ?? [];
+        $params['userEventSounds'] = $this->getUserEventSounds($userId);
+        $params['paramsInfo'] = $this->getParamsInfo();
         return view('user.sounds_settings', $params);
+    }
+
+    public function getUserEventSounds($userId)
+    {
+        $events = UserAudioEvent::where('user_id', '=', $userId)
+                ->leftJoin('events', 'user_audio_events.event_id', '=', 'events.id')
+                ->select('user_audio_events.*', 'events.name as event_name')
+                ->get()?->toArray() ?? [];
+
+        foreach ($events as $event) {
+            if (! empty($event['parameters'])) {
+                $decoded = json_decode($event['parameters'], true) ?: [];
+                $event['decoded_parameters'] = $decoded;
+            }
+            $result[] = $event;
+        }
+        return $result;
+    }
+
+    public function getParamsInfo()
+    {
+        $params = EventParam::all()?->toArray() ?? [];
+        $result = [];
+        foreach ($params as $param) {
+            $result[$param['code']] = $param['description'];
+        }
+        return $result;
     }
 
     public function saveGoalSound(Request $request)
@@ -92,8 +126,59 @@ class UserProfileController extends Controller
             $path = $audio->path;
             $filePath = $_SERVER['DOCUMENT_ROOT'] . '/storage/' . $path;
             File::delete($filePath);
-            custom_log($filePath, false);
             UserSingleAudio::destroy($data['id']);
+            return ['result' => true];
+        }
+        return ['result' => false];
+    }
+
+    public function saveEvent(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'event' => 'required|integer|min:1',
+                'sound' => 'required|file',
+                'params' => 'string|required'
+            ]);
+        } catch (ValidationException $exception) {
+            return [
+                'result' => false,
+                'error' => $exception->getMessage(),
+            ];
+        }
+        if ($request->hasFile('sound')) {
+            $userID = Auth()->user()->id;
+            $name = $request->file('sound')->getClientOriginalName();
+            $path = $request->file('sound')->store('audio_events');
+            $event = UserAudioEvent::create([
+                'user_id' => $userID,
+                'event_id' => $validated['event'],
+                'path' => $path,
+                'audio_name' => $name,
+                'parameters' => $validated['params']
+            ]);
+            $params['paramsInfo'] = $this->getParamsInfo();
+            $params['eventSound'] = [
+                'id' => $event->id,
+                'event_name' => Events::find($validated['event'])->name,
+                'decoded_parameters' => json_decode($validated['params'], true) ?: [],
+                'audio_name' => $name,
+                'path' => $path,
+            ];
+            return ['result' => true, 'content' => view('user.layouts.audio_event_container', $params)->render()];
+        }
+        return ['result' => false, 'error' => 'File is required'];
+    }
+
+    public function eventDelete(Request $request)
+    {
+        $data = $request->all();
+        if ($data['id']) {
+            $event = UserAudioEvent::find($data['id']);
+            $path = $event->path;
+            $filePath = $_SERVER['DOCUMENT_ROOT'] . '/storage/' . $path;
+            File::delete($filePath);
+            UserAudioEvent::destroy($data['id']);
             return ['result' => true];
         }
         return ['result' => false];

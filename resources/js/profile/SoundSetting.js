@@ -1,4 +1,4 @@
-export default function SoundSetting () {
+export default function SoundSetting() {
     let This = this;
 
     this.init = function () {
@@ -9,6 +9,8 @@ export default function SoundSetting () {
     this.buttons = function () {
         This.onGoalSoundButton();
         This.onDeleteButton();
+        This.onAddEventButton();
+        This.onEventDeleteButton();
     }
 
     this.onGoalSoundButton = function () {
@@ -57,4 +59,118 @@ export default function SoundSetting () {
                 }, 'json');
         });
     }
+
+    this.onAddEventButton = function () {
+        This.$container.on('click', '.js-add-event', function () {
+            $.confirm({
+                title: 'Добавить звук на событие',
+                boxWidth: '700px',
+                useBootstrap: false,
+                content: function () {
+                    let self = this;
+                    $.post(
+                        '/api/popup/addEventPopup',
+                        {},
+                        function (response) {
+                            if (response && response['result']) {
+                                self.setContent(response['content']);
+                                This.setAddParamButton(self.$content);
+                                This.setDeleteParamButton(self.$content);
+                            }
+                        }, 'json');
+                },
+                onContentReady: function () {
+                },
+                buttons: {
+                    accept: {
+                        text: 'Создать',
+                        btnClass: 'btn btn-green',
+                        action: function () {
+                            let self = this;
+                            let form = this.$content.find('#event-add');
+                            let formData = new FormData(form[0]);
+                            formData.append('_token', $('meta[name=csrf-token]').attr('content'));
+                            formData.append('params', This.prepareParam(this.$content));
+
+                            $.ajax({
+                                url: '/profile/save_event',
+                                data: formData,
+                                processData: false,
+                                contentType: false,
+                                type: 'POST',
+                                dataType: 'JSON',
+                                success: function (data) {
+                                    if (data && data['result']) {
+                                        This.$container.find('.js-event-container').append(data['content']);
+                                        self.close();
+                                    } else if (data['error']) {
+                                        $.alert({
+                                            title: 'Ошибка',
+                                            content: data['error'],
+                                            type: 'red',
+                                        });
+                                    }
+                                }
+                            });
+                            return false;
+                        }
+                    },
+                    close: {
+                        text: 'Отмена'
+                    }
+                }
+            })
+        });
+    }
+
+    this.onEventDeleteButton = function () {
+        This.$container.on('click', '.js-delete-event', function () {
+            let $self = $(this);
+            let $container = $self.parents('.js-event');
+            $container.hide();
+            let id = $container.data('id');
+            $.post(
+                '/profile/event_delete',
+                {
+                    '_token': $('meta[name=csrf-token]').attr('content'),
+                    'id': id,
+                },
+                function (response) {
+                    if (response && response['result']) {
+                        $container.remove();
+                    } else {
+                        $container.show();
+                    }
+                }, 'json');
+        });
+    }
+
+    this.setAddParamButton = function ($content) {
+        $content.find('.js-add-param').on('click', function () {
+            let $paramContainer = $content.find('.js-param-container').clone();
+            let html = '<div><button class="btn btn-close js-delete-param"></button></div>';
+            $paramContainer.append(html);
+            $content.find('.js-param').append($paramContainer.prop('outerHTML'));
+        });
+    }
+
+    this.setDeleteParamButton = function ($content) {
+        $content.on('click', '.js-delete-param', function () {
+            $(this).parents('.js-param-container').remove();
+        });
+    }
+
+
+    this.prepareParam = function ($content) {
+        let $containers = $content.find('.js-param-container');
+        let data = {};
+        $containers.each(function (k, v) {
+            let $self = $(this);
+            let param_name = $self.find('select[name=param]').val();
+            data[param_name] = $self.find('input[name=param_value]').val();
+        });
+        return JSON.stringify(data);
+    };
+
+
 }

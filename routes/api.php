@@ -21,6 +21,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::group(['namespace' => 'Popup'], function () {
     Route::prefix('/popup')->group(function () {
         Route::post('/getStartForm', 'PopupController@getStartGameForm');
+        Route::post('/addEventPopup', 'PopupController@addEventPopup');
     });
 });
 

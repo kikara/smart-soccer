@@ -21,9 +21,14 @@
             @include('user.layouts.nav')
             <div class="col-sm">
                 <div class="card">
-                    <div class="card-header">Добавить звук на событие</div>
-                    <div class="card-body">
-
+                    <div class="card-header d-flex align-items-center justify-content-between">
+                        Добавить звук на событие
+                        <button class="btn js-add-event">&plus;</button>
+                    </div>
+                    <div class="card-body js-event-container">
+                        @foreach($userEventSounds as $eventSound)
+                            @include('user.layouts.audio_event_container')
+                        @endforeach
                     </div>
                 </div>
 
