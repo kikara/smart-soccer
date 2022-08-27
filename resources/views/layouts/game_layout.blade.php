@@ -9,6 +9,9 @@
         <audio id="js-final-round">
             <source src="{{ asset('/storage/audio/system/final_round_fight.mp3') }}" type="audio/mpeg">
         </audio>
+        <audio id="js-goal">
+            <source src="{{ asset('/audio/goal.mp3') }}" type="audio/mpeg">
+        </audio>
     </div>
     <div class="row text-center">
         <div class="col-sm">

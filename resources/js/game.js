@@ -82,9 +82,11 @@ export default function Game() {
 
     this.onGameStarted = function (json) {
         if (json['is_busy']) {
+            let audio = document.getElementById('js-goal');
             if (This.contentLoaded) {
                 This.$container.find('.js-blue-count').html(json['round']['blue_count']);
                 This.$container.find('.js-red-count').html(json['round']['red_count']);
+                audio.play();
             } else {
                 This.updateContent(json)
             }

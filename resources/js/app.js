@@ -1,4 +1,4 @@
-import './bootstrap';
+// import './bootstrap';
 
 import Game from './game.js';
 import $ from 'jquery';
