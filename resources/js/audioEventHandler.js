@@ -48,12 +48,12 @@ export default function AudioEventHandler() {
     this.onGoalScored = function () {
         let userID = This.events['goal_scored'];
         let count = This.events['goal_count'];
-        console.log(userID + 'scored goal with continiously: ' + count);
+        // console.log(userID + 'scored goal with continiously: ' + count);
     }
 
     this.onGoalMissing = function () {
         let userID = This.events['goal_missed'];
         let count = This.events['goal_count'];
-        console.log(userID + 'scored goal with continiously: ' + count);
+        // console.log(userID + 'missed goal with continiously: ' + count);
     }
 }

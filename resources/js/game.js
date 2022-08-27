@@ -1,14 +1,11 @@
-import AudioEventHandler from "./audioEventHandler";
-
 export default function Game() {
     let This = this;
 
     this.init = function () {
-        This.audioEventHandler = new AudioEventHandler();
+        // This.audioEventHandler = new AudioEventHandler();
         This.$container = $('.js-container');
+        This.eventListenerInit();
         This.startTime = 0;
-        This.round = 0;
-        This.gameStarted = false;
         This.contentLoaded = false;
         This.tryToConnect();
         This.onOpen();
@@ -16,22 +13,18 @@ export default function Game() {
         This.onClose();
     }
 
-    this.tryToConnect = function () {
-        try {
-            This.conn = new WebSocket(WS_HOST);
-        } catch (e) {
-            console.log('Соединение не установлено');
-        }
+    this.eventListenerInit = function () {
+        This.eventListener = new EventListener();
+        This.eventListener.addEventListener('tableOccupied', This.onTableOccupied)
+        This.eventListener.addEventListener('gameStarted', This.onGameStarted)
+        This.eventListener.addEventListener('newRound', This.onRoundEndSideChange)
+        This.eventListener.addEventListener('gameOver', This.onGameOver)
+        This.eventListener.addEventListener('goal', This.onGoal);
     }
 
-    // this.onResetButton = function () {
-    //     This.$container.on('click', '.js-reset', function () {
-    //         if (This.conn.readyState === 1) {
-    //             let data = {'reset': true};
-    //             This.conn.send(JSON.stringify(data));
-    //         }
-    //     });
-    // }
+    this.tryToConnect = function () {
+        This.conn = new WebSocket(WS_HOST);
+    }
 
     this.onOpen = function () {
         This.conn.onopen = function (e) {
@@ -42,29 +35,16 @@ export default function Game() {
 
     this.onMessage = function () {
         This.conn.onmessage = function (e) {
-            This.messageHandler(e.data);
-        }
-    }
-
-    this.messageHandler = function (msg) {
-        let json = JSON.parse(msg);
-        This.onGameStarted(json);
-        This.onRoundEndSideChange(json);
-        This.onGameOver(json);
-        if (This.contentLoaded) {
-            This.audioEventHandler.handleEvent(json);
+            let json = JSON.parse(e.data);
+            This.eventListener.handle(json);
         }
     }
 
     this.onRoundEndSideChange = function (json) {
-        let currentRound = parseInt(json['current_round']);
-        if (currentRound !== This.round) {
-            if (json['is_side_change']) {
-                This.updateContent(json);
-            } else {
-                This.updateRoundCounts(json);
-            }
-            This.round = currentRound;
+        if (json['is_side_change']) {
+            This.updateContent(json);
+        } else {
+            This.updateRoundCounts(json);
         }
     }
 
@@ -74,33 +54,28 @@ export default function Game() {
         }
     }
 
-    this.onError = function () {
-        This.conn.onerror = function (e) {
-            console.log('Не удачная попытка соединения с сервером');
+    this.onTableOccupied = function (json) {
+        if (! This.contentLoaded) {
+            This.updateContent(json);
         }
     }
 
     this.onGameStarted = function (json) {
-        if (json['is_busy']) {
-            if (This.contentLoaded) {
-                This.goalAudioPlay(json);
-                This.$container.find('.js-blue-count').html(json['round']['blue_count']);
-                This.$container.find('.js-red-count').html(json['round']['red_count']);
-            } else {
-                This.updateContent(json)
-            }
+        if (! This.timerOn) {
+            This.timeOn = true;
+            This.startTime = parseInt(json['start_time']);
+            This.updatedInterval = setInterval(This.updateTime, 1000);
         }
-        if (json['game_started'] && ! json['game_over']) {
-            if (! This.timerOn) {
-                This.timerOn = true;
-                This.startTime = parseInt(json['start_time']);
-                This.updatedInterval = setInterval(This.updateTime, 1000);
-            }
+    }
+
+    this.onGoal = function (json) {
+        if (This.contentLoaded) {
+            This.$container.find('.js-blue-count').html(json['round']['blue_count']);
+            This.$container.find('.js-red-count').html(json['round']['red_count']);
         }
     }
 
     This.onGameOver = function (json) {
-        if (json['game_over']) {
             if (This.updatedInterval) {
                 clearInterval(This.updatedInterval);
                 This.updatedInterval = null;
@@ -112,11 +87,8 @@ export default function Game() {
                 function (response) {
                     This.$container.html($(response).children());
             });
-            This.sendToNewGame();
+            // This.sendToNewGame();
             This.contentLoaded = false;
-            This.startTime = 0;
-            This.round = 0;
-        }
     }
 
     This.updateTime = function () {
@@ -134,9 +106,9 @@ export default function Game() {
         This.conn.send(JSON.stringify({'cmd': 'state'}));
     }
 
-    this.sendToNewGame = function () {
-        This.conn.send(JSON.stringify({'cmd': 'new_game'}));
-    }
+    // this.sendToNewGame = function () {
+    //     This.conn.send(JSON.stringify({'cmd': 'new_game'}));
+    // }
 
     this.updateContent = function (json) {
         $.post(
@@ -157,27 +129,24 @@ export default function Game() {
         }
     }
 
-    this.goalAudioPlay = function (json) {
-        let round = json['round'];
-        let currentBlueCount = parseInt(This.$container.find('.js-blue-count').html());
-        let currentRedCount = parseInt(This.$container.find('.js-red-count').html());
-        console.log(round['blue_count']);
-        if (currentRedCount !== parseInt(round['red_count']) || currentBlueCount !== parseInt(round['blue_count'])) {
-            // let audio = document.getElementById('js-goal');
-            let audio = new Audio(This.getRandomAudioFile());
-            audio.addEventListener('loadeddata', function () {
-                audio.play();
-            }, false);
-            audio.play();
-        }
-    }
+    // this.goalAudioPlay = function (json) {
+    //     let round = json['round'];
+    //     let currentBlueCount = parseInt(This.$container.find('.js-blue-count').html());
+    //     let currentRedCount = parseInt(This.$container.find('.js-red-count').html());
+    //     if (currentRedCount !== parseInt(round['red_count']) || currentBlueCount !== parseInt(round['blue_count'])) {
+    //         let audio = new Audio(This.getRandomAudioFile());
+    //         audio.addEventListener('loadeddata', function () {
+    //             audio.play();
+    //         }, false);
+    //     }
+    // }
 
-    this.getRandomAudioFile = function () {
-        let files = [
-            'goal.mp3', 'icq.mp3', 'finish-him.mp3',
-            'liu-kang-kick.mp3', 'delo-sdelano.mp3', 'meme-de-creditos-finales.mp3',
-            'cr_suuu.mp3', 'mario-meme.mp3', 'hallelujahshort.mp3', 'that_was_easy.mp3'];
-        let file = files[Math.floor(Math.random() * files.length)];
-        return '/audio/' + file;
-    }
+    // this.getRandomAudioFile = function () {
+    //     let files = [
+    //         'goal.mp3', 'icq.mp3', 'finish-him.mp3',
+    //         'liu-kang-kick.mp3', 'delo-sdelano.mp3', 'meme-de-creditos-finales.mp3',
+    //         'cr_suuu.mp3', 'mario-meme.mp3', 'hallelujahshort.mp3', 'that_was_easy.mp3'];
+    //     let file = files[Math.floor(Math.random() * files.length)];
+    //     return '/audio/' + file;
+    // }
 }
