@@ -1,8 +1,11 @@
-// import './bootstrap';
+import $ from 'jquery';
+global.$ = global.jQuery = $;
 
 import Game from './game.js';
-import $ from 'jquery';
+import Debug from "./debug";
+
 window.game = new Game();
-window.$ = window.jQuery = $;
-// window.WS_HOST = 'ws://192.168.1.30:8080';
-window.WS_HOST = 'ws://192.168.133.86:8080';
+window.Debug = Debug;
+require('./tournament/Tournament');
+require('bootstrap');
+require('./config');

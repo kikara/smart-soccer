@@ -2,13 +2,15 @@
 
 @section('content')
     <script>
-        conn = new WebSocket(WS_HOST);
-        conn.onopen = function (e) {
-            console.log('Соединение установлено');
-        }
-        conn.onmessage = function (e) {
-            console.log(e.data);
-        }
+        document.addEventListener('DOMContentLoaded', function () {
+            conn = new WebSocket(WS_HOST);
+            conn.onopen = function (e) {
+                console.log('Соединение установлено');
+            }
+            conn.onmessage = function (e) {
+                console.log(e.data);
+            }
+        });
     </script>
     <div class="container js-container">
         <div class="px-4 py-5 my-5 text-center">

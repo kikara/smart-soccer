@@ -37,3 +37,7 @@ Route::group(['namespace' => 'Tournaments'], function() {
         Route::post('/add', 'TournamentController@createPage')->name('tournament_add');
     });
 });
+
+Route::group(['namespace' => 'Debug'], function () {
+    Route::get('/debug', 'DebugController@index')->name('debug');
+});

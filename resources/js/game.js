@@ -82,11 +82,10 @@ export default function Game() {
 
     this.onGameStarted = function (json) {
         if (json['is_busy']) {
-            let audio = document.getElementById('js-goal');
             if (This.contentLoaded) {
+                This.goalAudioPlay(json);
                 This.$container.find('.js-blue-count').html(json['round']['blue_count']);
                 This.$container.find('.js-red-count').html(json['round']['red_count']);
-                audio.play();
             } else {
                 This.updateContent(json)
             }
@@ -156,5 +155,29 @@ export default function Game() {
                 card.find('.js-round-count').removeAttr('hidden');
             }
         }
+    }
+
+    this.goalAudioPlay = function (json) {
+        let round = json['round'];
+        let currentBlueCount = parseInt(This.$container.find('.js-blue-count').html());
+        let currentRedCount = parseInt(This.$container.find('.js-red-count').html());
+        console.log(round['blue_count']);
+        if (currentRedCount !== parseInt(round['red_count']) || currentBlueCount !== parseInt(round['blue_count'])) {
+            // let audio = document.getElementById('js-goal');
+            let audio = new Audio(This.getRandomAudioFile());
+            audio.addEventListener('loadeddata', function () {
+                audio.play();
+            }, false);
+            audio.play();
+        }
+    }
+
+    this.getRandomAudioFile = function () {
+        let files = [
+            'goal.mp3', 'icq.mp3', 'finish-him.mp3',
+            'liu-kang-kick.mp3', 'delo-sdelano.mp3', 'meme-de-creditos-finales.mp3',
+            'cr_suuu.mp3', 'mario-meme.mp3', 'hallelujahshort.mp3', 'that_was_easy.mp3'];
+        let file = files[Math.floor(Math.random() * files.length)];
+        return '/audio/' + file;
     }
 }

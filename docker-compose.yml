@@ -11,10 +11,12 @@ services:
             - ./.docker/nginx/conf.d:/etc/nginx/conf.d
         depends_on:
             - php
+        container_name: soccer_nginx
 
     php:
         build: ./.docker/php
         restart: always
+
         working_dir: /var/www
         volumes:
             - ./:/var/www
@@ -48,7 +50,6 @@ services:
             - "8080:80"
         volumes:
             - ./pma-data:/var/lib/pma
-
 
 volumes:
     mariadb-data:

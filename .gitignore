@@ -10,7 +10,7 @@
 Homestead.json
 Homestead.yaml
 auth.json
-npm-debug.log
+npm-debug.log.docker
 yarn-error.log
 /.idea
 /.vscode
@@ -18,6 +18,8 @@ yarn-error.log
 error.log
 .log.log
 /public/log.log
-/public/audio
+/public/js/*
+/public/css/*
+/.env
 /mariadb-data
 /pma-data
