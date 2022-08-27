@@ -21,7 +21,12 @@ Auth::routes();
 //});
 
 Route::group(['namespace' => 'UserProfile'], function () {
-    Route::get('/profile', 'UserProfileController@index')->name('profile');
+    Route::prefix('/profile')->group(function () {
+        Route::get('/', 'UserProfileController@index')->name("profile");
+        Route::get('/sound_settings', 'UserProfileController@sounds')->name('sound_settings');
+        Route::post('/save_single_sound', 'UserProfileController@saveGoalSound');
+        Route::post('/delete_single_audio', 'UserProfileController@deleteSingleAudio');
+    });
     Route::post('/saveProfile', 'UserProfileController@saveProfile');
 });
 Route::group(['namespace' => 'Game'], function() {

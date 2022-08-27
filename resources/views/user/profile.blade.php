@@ -12,16 +12,7 @@
         </div>
     </div>
     <div class="row mt-5">
-        <div class="col-sm-3 mb-3">
-            <div class="card">
-                <div class="card-header">Детали</div>
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item active"><a href="" class="card-link nav-link">Общие настройки</a></li>
-                    <li class="list-group-item"><a href="" class="card-link nav-link">Команды</a></li>
-                    <li class="list-group-item"><a href="" class="card-link nav-link">Последние игры</a></li>
-                </ul>
-            </div>
-        </div>
+        @include('user.layouts.nav')
         <div class="col-sm">
             <div class="card">
                 <div class="card-header">Настройки пользователя</div>
