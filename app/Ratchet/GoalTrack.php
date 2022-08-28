@@ -9,6 +9,7 @@ class GoalTrack
 {
     private int $goalScoredUserID = 0;
     private int $goalMissedUserID = 0;
+    private int $goalScoredCount = 0;
 
 //    private int $goalsScoredCount = 0;
 //    private int $goalsMissedCount = 0;
@@ -42,5 +43,18 @@ class GoalTrack
     public function getGoalCount()
     {
         return $this->goalCount;
+    }
+
+    /**
+     * Счет того кто забил
+     */
+    public function setScoredCount($count)
+    {
+        $this->goalScoredCount = (int) $count;
+    }
+
+    public function getScoredCount()
+    {
+        return $this->goalScoredCount;
     }
 }

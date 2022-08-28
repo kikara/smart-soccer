@@ -21,7 +21,6 @@ export default function EventListener() {
     }
 
     this.handle = function (json) {
-        console.log(json);
         This.onTableOccupied(json);
         This.onGameStarted(json);
         This.onGoal(json);

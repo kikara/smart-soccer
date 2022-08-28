@@ -69,6 +69,7 @@ class UserProfileController extends Controller
 
     public function getUserEventSounds($userId)
     {
+        $result = [];
         $events = UserAudioEvent::where('user_id', '=', $userId)
                 ->leftJoin('events', 'user_audio_events.event_id', '=', 'events.id')
                 ->select('user_audio_events.*', 'events.name as event_name')

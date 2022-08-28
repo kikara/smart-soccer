@@ -9,6 +9,9 @@ use App\Models\GameSettingTemplate;
 use App\Models\Round;
 use App\Models\TableOccupation;
 use App\Models\User;
+use App\Models\UserAudioEvent;
+use App\Models\UserSingleAudio;
+use Illuminate\Http\Request;
 
 class GameController extends Controller
 {
@@ -125,6 +128,43 @@ class GameController extends Controller
             if ($winnerID) {
                 $result[$round['winner_id']] += 1;
             }
+        }
+        return $result;
+    }
+
+    public function getGamersAudio(Request $request)
+    {
+        $data = $request->all();
+        $result['result'] = false;
+        if (! empty($data['gamers'])) {
+            $result['sounds'] = $this->getGamersSound($data['gamers']);
+            $result['result'] = true;
+            return $result;
+        }
+        return $result;
+    }
+
+    public function getRandomSounds($userId)
+    {
+        return UserSingleAudio::where('user_id', '=', $userId)
+                ->select('path')
+                ->get()?->toArray() ?? [];
+    }
+
+    public function getEventSounds($userId)
+    {
+        return UserAudioEvent::where('user_id', '=', $userId)
+                ->leftJoin('events', 'user_audio_events.event_id', '=', 'events.id')
+                ->select('user_audio_events.parameters', 'user_audio_events.path', 'events.code')
+                ->get()?->toArray() ?? [];
+    }
+
+    public function getGamersSound(array $gamers)
+    {
+        $result = [];
+        foreach ($gamers as $userId) {
+            $result[$userId]['random_sounds'] = $this->getRandomSounds($userId);
+            $result[$userId]['event_sounds'] = $this->getEventSounds($userId);
         }
         return $result;
     }

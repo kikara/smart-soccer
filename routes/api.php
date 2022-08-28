@@ -29,6 +29,7 @@ Route::group(['namespace' => 'Game'], function () {
     Route::post('/getMainLayout', 'GameController@getMainLayout');
     Route::post('/getMainInfo', 'GameController@getMainInfo');
     Route::post('/getNewTableLayout', 'GameController@getNewTableLayout');
+    Route::post('/getGamersAudio', 'GameController@getGamersAudio');
 });
 
 Route::group(['namespace' => 'Bot'], function () {

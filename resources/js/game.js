@@ -5,6 +5,7 @@ export default function Game() {
         // This.audioEventHandler = new AudioEventHandler();
         This.$container = $('.js-container');
         This.eventListenerInit();
+        This.audioEventListenerInit();
         This.startTime = 0;
         This.contentLoaded = false;
         This.tryToConnect();
@@ -15,11 +16,18 @@ export default function Game() {
 
     this.eventListenerInit = function () {
         This.eventListener = new EventListener();
-        This.eventListener.addEventListener('tableOccupied', This.onTableOccupied)
-        This.eventListener.addEventListener('gameStarted', This.onGameStarted)
-        This.eventListener.addEventListener('newRound', This.onRoundEndSideChange)
-        This.eventListener.addEventListener('gameOver', This.onGameOver)
+        This.eventListener.addEventListener('tableOccupied', This.onTableOccupied);
+        This.eventListener.addEventListener('gameStarted', This.onGameStarted);
+        This.eventListener.addEventListener('newRound', This.onRoundEndSideChange);
+        This.eventListener.addEventListener('gameOver', This.onGameOver);
         This.eventListener.addEventListener('goal', This.onGoal);
+    }
+
+    this.audioEventListenerInit = function () {
+        This.audioEventListener = new AudioEventListener();
+        This.audioEventListener.init();
+        This.eventListener.addEventListener('tableOccupied', This.audioEventListener.gamersAudioInit);
+        This.eventListener.addEventListener('goal', This.audioEventListener.onGoal);
     }
 
     this.tryToConnect = function () {
@@ -128,25 +136,4 @@ export default function Game() {
             }
         }
     }
-
-    // this.goalAudioPlay = function (json) {
-    //     let round = json['round'];
-    //     let currentBlueCount = parseInt(This.$container.find('.js-blue-count').html());
-    //     let currentRedCount = parseInt(This.$container.find('.js-red-count').html());
-    //     if (currentRedCount !== parseInt(round['red_count']) || currentBlueCount !== parseInt(round['blue_count'])) {
-    //         let audio = new Audio(This.getRandomAudioFile());
-    //         audio.addEventListener('loadeddata', function () {
-    //             audio.play();
-    //         }, false);
-    //     }
-    // }
-
-    // this.getRandomAudioFile = function () {
-    //     let files = [
-    //         'goal.mp3', 'icq.mp3', 'finish-him.mp3',
-    //         'liu-kang-kick.mp3', 'delo-sdelano.mp3', 'meme-de-creditos-finales.mp3',
-    //         'cr_suuu.mp3', 'mario-meme.mp3', 'hallelujahshort.mp3', 'that_was_easy.mp3'];
-    //     let file = files[Math.floor(Math.random() * files.length)];
-    //     return '/audio/' + file;
-    // }
 }

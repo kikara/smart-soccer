@@ -54,6 +54,7 @@ class Round
             $this->winnerID = $this->blueGamerID;
             $this->roundEnd = true;
         }
+        $this->goalTrack->setScoredCount($this->blueCount);
     }
 
     public function test()
@@ -71,6 +72,7 @@ class Round
             $this->winnerID = $this->redGamerID;
             $this->roundEnd = true;
         }
+        $this->goalTrack->setScoredCount($this->redCount);
     }
 
     public function reset()
