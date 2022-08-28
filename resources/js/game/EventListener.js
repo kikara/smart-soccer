@@ -45,7 +45,7 @@ export default function EventListener() {
     this.onGoal = function (json) {
         let blue = parseInt(json['round']['blue_count']);
         let red = parseInt(json['round']['red_count']);
-        if (blue !== blueCount || red !== redCount) {
+        if ((blue !== blueCount || red !== redCount) && ! json['events']['is_new_round']) {
             This.notify('goal', json);
         }
         blueCount = blue;
@@ -61,13 +61,12 @@ export default function EventListener() {
     };
 
     this.onGameOver = function (json) {
-        if (json['game_over'] && json['game_over'] !== isGameOver) {
+        if (json['game_over']) {
             This.notify('gameOver', json);
             blueCount = 0;
             redCount = 0;
             round = 0;
         }
-        isGameOver = json['game_over'];
     };
 
     this.addEventListener = function (event, callback) {

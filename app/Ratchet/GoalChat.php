@@ -33,6 +33,9 @@ class GoalChat implements MessageComponentInterface
                 $client->send($encoded);
             }
         }
+        if ($this->game->isGameOver()) {
+            $this->game = Game::newGame();
+        }
     }
 
     public function onClose(ConnectionInterface $conn)

@@ -2,7 +2,6 @@ export default function Game() {
     let This = this;
 
     this.init = function () {
-        // This.audioEventHandler = new AudioEventHandler();
         This.$container = $('.js-container');
         This.eventListenerInit();
         This.audioEventListenerInit();
@@ -54,6 +53,8 @@ export default function Game() {
         } else {
             This.updateRoundCounts(json);
         }
+        This.$container.find('.js-blue-count').html('0');
+        This.$container.find('.js-red-count').html('0');
     }
 
     this.onClose = function () {
@@ -95,7 +96,6 @@ export default function Game() {
                 function (response) {
                     This.$container.html($(response).children());
             });
-            // This.sendToNewGame();
             This.contentLoaded = false;
     }
 
@@ -113,10 +113,6 @@ export default function Game() {
     this.getGameState = function () {
         This.conn.send(JSON.stringify({'cmd': 'state'}));
     }
-
-    // this.sendToNewGame = function () {
-    //     This.conn.send(JSON.stringify({'cmd': 'new_game'}));
-    // }
 
     this.updateContent = function (json) {
         $.post(

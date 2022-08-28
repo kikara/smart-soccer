@@ -50,6 +50,10 @@ export default function AudioEventListener () {
         let formEvent = This.formEvent(json);
         let userId = formEvent['user_id'];
         if (Object.keys(This.usersAudio).length !== 0) {
+            let target = This.usersAudio[userId];
+            if (! target) {
+                return false;
+            }
             let eventSounds = This.usersAudio[userId]['userEventSounds'] ?? [];
             let params = formEvent['parameters'];
             for (let item of eventSounds) {
@@ -64,6 +68,10 @@ export default function AudioEventListener () {
     this.randomAudioPath = function (json) {
         let userId = json['events']['goal_scored'];
         if (Object.keys(This.usersAudio).length !== 0) {
+            let target = This.usersAudio[userId];
+            if (! target) {
+                return false;
+            }
             let randoms = This.usersAudio[userId]['randomGoalSounds'];
             if (randoms.length === 0) {
                 return false;
