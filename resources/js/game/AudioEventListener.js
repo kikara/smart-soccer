@@ -124,4 +124,31 @@ export default function AudioEventListener () {
             }
         };
     }
+
+
+    this.onNewRound = function (json) {
+        This.onRoundTwo(json);
+        This.onRoundThree(json);
+    }
+
+    this.onRoundOne = function (json) {
+        if (json['current_round'] === 0) {
+            let audio = document.getElementById('js-first-round');
+            audio.play();
+        }
+    }
+
+    this.onRoundTwo = function (json) {
+        if (json['current_round'] === 1) {
+            let audio = document.getElementById('js-second-round');
+            audio.play();
+        }
+    }
+
+    this.onRoundThree = function (json) {
+        if (json['current_round'] === 2) {
+            let audio = document.getElementById('js-final-round');
+            audio.play();
+        }
+    }
 }

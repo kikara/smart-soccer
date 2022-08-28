@@ -63,6 +63,8 @@ export default function EventListener() {
     this.onGameOver = function (json) {
         if (json['game_over']) {
             This.notify('gameOver', json);
+            isGameStarted = false;
+            tableOccupied = false;
             blueCount = 0;
             redCount = 0;
             round = 0;
@@ -76,6 +78,7 @@ export default function EventListener() {
     }
 
     this.notify = function (event, json) {
+        console.log('this is ', event);
         let callbacks = subscribers[event] ?? [];
         for (let callback of callbacks) {
             callback(json);
