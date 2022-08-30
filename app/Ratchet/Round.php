@@ -55,6 +55,7 @@ class Round
             $this->roundEnd = true;
         }
         $this->goalTrack->setScoredCount($this->blueCount);
+        $this->goalTrack->setMissedCount($this->redCount);
     }
 
     public function test()
@@ -73,6 +74,7 @@ class Round
             $this->roundEnd = true;
         }
         $this->goalTrack->setScoredCount($this->redCount);
+        $this->goalTrack->setMissedCount($this->blueCount);
     }
 
     public function reset()

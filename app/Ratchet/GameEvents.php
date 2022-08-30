@@ -28,6 +28,7 @@ class GameEvents
             'goal_missed' => $this->goalMissed(),
             'goal_count' => $this->goalCountContinious(),
             'goal_scored_count' => $this->goalScoredCount(),
+            'opponent-score' => $this->goalMissedCount(),
         ];
     }
 
@@ -67,5 +68,10 @@ class GameEvents
     private function goalScoredCount()
     {
         return $this->game->getCurrentRound()->goalTrack->getScoredCount();
+    }
+
+    private function goalMissedCount()
+    {
+        return $this->game->getCurrentRound()->goalTrack->getMissedCount();
     }
 }

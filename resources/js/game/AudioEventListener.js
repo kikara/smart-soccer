@@ -90,9 +90,13 @@ export default function AudioEventListener () {
 
     this.paramsCompare = function (params, userParams) {
         let combinations = [
+            ['continuity', 'count', 'opponent-score'],
             ['continuity', 'count'],
+            ['continuity', 'opponent-score'],
+            ['count', 'opponent-score'],
             ['continuity'],
             ['goal-count'],
+            ['count'],
         ];
         for (let item of combinations) {
             let result = false;
@@ -121,6 +125,7 @@ export default function AudioEventListener () {
             'parameters': {
                 'continuity': json['events']['goal_count'],
                 'goal-count': json['events']['goal_scored_count'],
+                'opponent-score': json['events']['goal_missed'],
             }
         };
     }
