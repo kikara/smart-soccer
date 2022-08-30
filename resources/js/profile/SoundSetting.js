@@ -166,8 +166,12 @@ export default function SoundSetting() {
         let data = {};
         $containers.each(function (k, v) {
             let $self = $(this);
-            let param_name = $self.find('select[name=param]').val();
-            data[param_name] = $self.find('input[name=param_value]').val();
+            let value = $self.find('input[name=param_value]').val();
+            let selected = $self.find('select[name=param]').val();
+            if (value && selected !== '0') {
+                let param_name = $self.find('select[name=param]').val();
+                data[param_name] = value;
+            }
         });
         return JSON.stringify(data);
     };
