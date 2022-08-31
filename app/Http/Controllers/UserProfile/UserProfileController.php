@@ -37,7 +37,7 @@ class UserProfileController extends Controller
     public function saveProfile(Request $request)
     {
         $validated = $request->validate([
-            'login' => 'required|min:6|max:255',
+            'login' => 'required|max:255',
             'name' => 'nullable|string|max:255',
             'email' => 'nullable|email:rfc,dns',
             'avatar' => 'file',
