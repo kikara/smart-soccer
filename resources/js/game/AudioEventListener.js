@@ -39,10 +39,7 @@ export default function AudioEventListener () {
         let audioPath = eventAudioPath ? eventAudioPath : This.randomAudioPath(json);
         audioPath = audioPath ? '/storage/' + audioPath : This.systemAudioPath();
         if (audioPath) {
-            let audio = new Audio(audioPath);
-            audio.addEventListener('loadeddata', function () {
-                audio.play();
-            }, false);
+            This.play(audioPath);
         }
     }
 
@@ -116,22 +113,27 @@ export default function AudioEventListener () {
 
     this.onRoundOne = function (json) {
         if (json['current_round'] === 0) {
-            let audio = document.getElementById('js-first-round');
-            audio.play();
+            This.play('/audio/round_1_fight.mp3');
         }
     }
 
     this.onRoundTwo = function (json) {
         if (json['current_round'] === 1) {
-            let audio = document.getElementById('js-second-round');
-            audio.play();
+            This.play('/audio/round_2_fight.mp3');
         }
     }
 
     this.onRoundThree = function (json) {
         if (json['current_round'] === 2) {
-            let audio = document.getElementById('js-final-round');
-            audio.play();
+            This.play('/audio/final_round_fight.mp3');
         }
+    }
+
+    this.play = (audioPath) => {
+        let audio = new Audio();
+        audio.addEventListener('loadeddata', function () {
+            audio.play();
+        }, false);
+        audio.src = audioPath;
     }
 }
