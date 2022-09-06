@@ -89,6 +89,7 @@ export default function AudioEventListener () {
     }
 
     this.paramsCompare = function (params, userParams) {
+        return This.testCompare(params, userParams);
         let combinations = [
             ['continuity', 'count', 'opponent-score'],
             ['count', 'opponent-score'],
@@ -116,6 +117,15 @@ export default function AudioEventListener () {
             }
         }
         return false;
+    };
+
+    this.testCompare = function (params, userParams) {
+        for (let key in userParams) {
+            if (params[key] != userParams[key]) {
+                return false;
+            }
+        }
+        return true;
     };
 
     this.formEvent = function (json) {
