@@ -14,6 +14,7 @@ export default function EventListener() {
      * gameStarted - игра началась
      * newRound - новый раунд
      * goal - гол
+     * gameOver - игра закончилась
      */
 
     this.init = function () {
@@ -46,7 +47,9 @@ export default function EventListener() {
         let blue = parseInt(json['round']['blue_count']);
         let red = parseInt(json['round']['red_count']);
         if ((blue !== blueCount || red !== redCount) && ! json['events']['is_new_round']) {
-            This.notify('goal', json);
+            if (! json['game_over']) {
+                This.notify('goal', json);
+            }
         }
         blueCount = blue;
         redCount = red;

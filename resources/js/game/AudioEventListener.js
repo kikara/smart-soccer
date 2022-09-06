@@ -3,6 +3,8 @@ import GamerAudio from "./GamerAudio";
 export default function AudioEventListener () {
     let This = this;
     this.usersAudio = {};
+    const GOAL_EVENT = 'goal';
+    const GAME_OVER = 'game_over';
 
     this.init = function () {
     }
@@ -23,7 +25,11 @@ export default function AudioEventListener () {
                         }
                         for (let item of value['event_sounds']) {
                             let obj = JSON.parse(item['parameters']);
-                            gamerAudio.userEventSounds.push({
+                            let code = item['code'];
+                            if (! gamerAudio.userEventSounds[code]) {
+                                gamerAudio.userEventSounds[code] = [];
+                            }
+                            gamerAudio.userEventSounds[code].push({
                                 'parameters': obj,
                                 'path': item['path'],
                             });
@@ -43,6 +49,26 @@ export default function AudioEventListener () {
         }
     }
 
+    this.onGameOver = (json) => {
+        let winner_user_id = json['game_winner_id'];
+        let eventSounds = This.usersAudio[winner_user_id]['userEventSounds'][GOAL_EVENT] ?? [];
+        let formEvent = This.formEvent(json);
+        let params = formEvent['parameters'];
+        let winnerAudioPath = '/audio/winner.mp3';
+        for (let item of eventSounds) {
+            let eventParameters = item['parameters'];
+            if (! ('winner' in eventParameters)) {
+                continue;
+            }
+            params['winner'] = eventParameters['winner'];
+            if (This.paramsCompare(params, eventParameters)) {
+                winnerAudioPath = '/storage/' + item['path'];
+                break;
+            }
+        }
+        This.play(winnerAudioPath);
+    }
+
     this.searchEventAudioPath = function (json) {
         let formEvent = This.formEvent(json);
         let userId = formEvent['user_id'];
@@ -51,7 +77,7 @@ export default function AudioEventListener () {
             if (! target) {
                 return false;
             }
-            let eventSounds = This.usersAudio[userId]['userEventSounds'] ?? [];
+            let eventSounds = This.usersAudio[userId]['userEventSounds'][GOAL_EVENT] ?? [];
             let params = formEvent['parameters'];
             for (let item of eventSounds) {
                 if (This.paramsCompare(params, item['parameters'])) {

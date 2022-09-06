@@ -29,6 +29,7 @@ export default function Game() {
         This.eventListener.addEventListener('goal', This.audioEventListener.onGoal);
         This.eventListener.addEventListener('newRound', This.audioEventListener.onNewRound);
         This.eventListener.addEventListener('gameStarted', This.audioEventListener.onRoundOne);
+        This.eventListener.addEventListener('gameOver', This.audioEventListener.onGameOver);
     }
 
     this.tryToConnect = function () {
