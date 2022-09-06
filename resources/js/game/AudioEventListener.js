@@ -89,39 +89,8 @@ export default function AudioEventListener () {
     }
 
     this.paramsCompare = function (params, userParams) {
-        return This.testCompare(params, userParams);
-        let combinations = [
-            ['continuity', 'count', 'opponent-score'],
-            ['count', 'opponent-score'],
-            ['continuity', 'opponent-score'],
-            ['continuity', 'count'],
-            ['continuity'],
-            ['goal-count'],
-            ['count'],
-        ];
-        for (let item of combinations) {
-            let result = false;
-            for (let key of item) {
-                if (! (key in userParams)) {
-                    result = false;
-                    break;
-                }
-                if (params[key] != userParams[key]) {
-                    result = false;
-                    break;
-                }
-                result = true;
-            }
-            if (result) {
-                return true;
-            }
-        }
-        return false;
-    };
-
-    this.testCompare = function (params, userParams) {
         for (let key in userParams) {
-            if (params[key] != userParams[key]) {
+            if (parseInt(params[key]) !== parseInt(userParams[key])) {
                 return false;
             }
         }
@@ -139,7 +108,6 @@ export default function AudioEventListener () {
             }
         };
     }
-
 
     this.onNewRound = function (json) {
         This.onRoundTwo(json);
