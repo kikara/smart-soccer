@@ -64,8 +64,6 @@ export default function SoundSetting() {
         This.$container.on('click', '.js-add-event', function () {
             $.confirm({
                 title: 'Добавить звук на событие',
-                boxWidth: '700px',
-                useBootstrap: false,
                 content: function () {
                     let self = this;
                     $.post(
@@ -76,6 +74,7 @@ export default function SoundSetting() {
                                 self.setContent(response['content']);
                                 This.setAddParamButton(self.$content);
                                 This.setDeleteParamButton(self.$content);
+                                This.setSelectListener(self);
                             }
                         }, 'json');
                 },
@@ -166,7 +165,8 @@ export default function SoundSetting() {
         let data = {};
         $containers.each(function (k, v) {
             let $self = $(this);
-            let value = $self.find('input[name=param_value]').val();
+            let inputValue = $self.find('input[name=param_value]').val();
+            let value = inputValue ? inputValue : 1;
             let selected = $self.find('select[name=param]').val();
             if (value && selected !== '0') {
                 let param_name = $self.find('select[name=param]').val();
@@ -176,5 +176,12 @@ export default function SoundSetting() {
         return JSON.stringify(data);
     };
 
-
+    this.setSelectListener = (context) => {
+        context.$content.on('change', 'select[name=param]', function () {
+            let value = this.value;
+            if (value === 'winner') {
+                $(this).parents('.js-param-container').find('input[name=param_value]').val(1).hide();
+            }
+        });
+    }
 }
