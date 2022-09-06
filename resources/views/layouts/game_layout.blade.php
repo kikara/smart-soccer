@@ -19,7 +19,7 @@
                 @php
                 $path = $data['blue_gamer_name']['avatar_path'] ? 'storage/' . $data['blue_gamer_name']['avatar_path'] : 'storage/avatar.png'
                 @endphp
-                <img src="{{ asset($path) }}" alt="" class="rounded" style="width: 180px">
+                <img src="{{ asset($path) }}" alt="" class="rounded-circle" style="width: 150px; height: 150px">
                 <h5 class="card-title js-blue-name">{{ $data['blue_gamer_name']['login'] }}</h5>
                 <div class="mt-3" style="padding-right: 20%; padding-left: 20%">
                     <div class="card bg-primary text-white js-card-color-primary">
@@ -50,7 +50,7 @@
                 @php
                     $path = $data['red_gamer_name']['avatar_path'] ? 'storage/' . $data['red_gamer_name']['avatar_path'] : 'storage/avatar.png'
                 @endphp
-                <img src="{{ asset($path) }}" alt="" class="rounded" style="width: 180px">
+                <img src="{{ asset($path) }}" alt="" class="rounded-circle" style="width: 150px; height: 150px">
                 <h5 class="card-title js-red-name">{{ $data['red_gamer_name']['login'] }}</h5>
                 <div class="mt-3" style="padding-right: 20%; padding-left: 20%">
                     <div class="card bg-danger text-white js-card-color-danger">
