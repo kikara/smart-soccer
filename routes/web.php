@@ -13,12 +13,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', 'IndexController@index');
+Route::get('/', function () {
+    return redirect()->route('game');
+});
 
 Auth::routes();
-//Route::get('/goalTest', function () {
-//    return view('goal');
-//});
 
 Route::group(['namespace' => 'UserProfile'], function () {
     Route::prefix('/profile')->group(function () {
@@ -31,6 +30,7 @@ Route::group(['namespace' => 'UserProfile'], function () {
     });
     Route::post('/saveProfile', 'UserProfileController@saveProfile');
 });
+
 Route::group(['namespace' => 'Game'], function() {
     Route::get('/game', 'GameController@index')->name('game');
 });
