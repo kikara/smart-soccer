@@ -35,8 +35,6 @@ Route::group(['namespace' => 'Game'], function() {
     Route::get('/game', 'GameController@index')->name('game');
 });
 
-Route::get('/home', 'HomeController@index')->name('home');
-
 Route::group(['namespace' => 'Tournaments'], function() {
     Route::prefix('/tournaments')->group(function() {
         Route::get('/', 'TournamentController@all')->name('tournaments_all');
@@ -47,4 +45,9 @@ Route::group(['namespace' => 'Tournaments'], function() {
 
 Route::group(['namespace' => 'Debug'], function () {
     Route::get('/debug', 'DebugController@index')->name('debug');
+});
+
+
+Route::group(['namespace' => 'Statistics'], function () {
+    Route::get('/statistics', 'StatisticController@index')->name('statistics');
 });
