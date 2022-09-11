@@ -47,7 +47,11 @@ Route::group(['namespace' => 'Debug'], function () {
     Route::get('/debug', 'DebugController@index')->name('debug');
 });
 
-
 Route::group(['namespace' => 'Statistics'], function () {
     Route::get('/statistics', 'StatisticController@index')->name('statistics');
+});
+
+Route::get('/calculateRating', function () {
+    \App\Taskers\UserRatingCalculator::calculate();
+    echo 'done';
 });

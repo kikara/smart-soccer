@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Game;
 use App\Models\Round;
 use App\Models\User;
+use App\Models\UserRating;
 use Illuminate\Support\Facades\DB;
 
 class StatisticController extends Controller
@@ -27,6 +28,7 @@ class StatisticController extends Controller
         $users = $this->users();
         $gamesParams = $this->getGamesParams();
         $roundParams = $this->getRoundParams();
+        $ratingParams = $this->getRatingParams();
         $tableData = [];
         foreach ($users as $user) {
             $temp = [];
@@ -38,8 +40,12 @@ class StatisticController extends Controller
             $temp['count_goals'] = $roundParams['count_goals'][$user['id']] ?? 0;
             $temp['missed_goals'] = $roundParams['missed_goals'][$user['id']] ?? 0;
             $temp['total_time'] = $this->formatTime($gamesParams['total_time'][$user['id']] ?? 0);
+            $temp['rating'] = (int) $ratingParams[$user['id']];
             $tableData[] = $temp;
         }
+        usort($tableData, function ($a, $b) {
+            return $b['rating'] <=> $a['rating'];
+        });
         return $tableData;
     }
 
@@ -84,6 +90,16 @@ class StatisticController extends Controller
             $result['winner'][$game['winner']] = $this->increment($result['winner'][$game['winner']] ?? 0);
             $result['total_time'][$game['gamerOne']] = $this->increment($game['totalTime'] ?? 0);
             $result['total_time'][$game['gamerTwo']] = $this->increment($game['totalTime'] ?? 0);
+        }
+        return $result;
+    }
+
+    private function getRatingParams()
+    {
+        $ratings = UserRating::all()?->toArray();
+        $result = [];
+        foreach ($ratings as $rating) {
+            $result[$rating['user_id']] = $rating['rating'];
         }
         return $result;
     }

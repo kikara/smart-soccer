@@ -32,7 +32,7 @@ class GameController extends Controller
 
     public function getMainInfo()
     {
-        $data = request()->all();
+        $data = request()?->all();
         $data['blue_gamer_name'] = User::find($data['blue_gamer_id'])->toArray();
         $data['red_gamer_name'] = User::find($data['red_gamer_id'])->toArray();
         return $data;

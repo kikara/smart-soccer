@@ -27,7 +27,7 @@
                     <td>{{ $data['count_goals'] }}</td>
                     <td>{{ $data['missed_goals'] }}</td>
                     <td>{{ $data['total_time'] }}</td>
-                    <td>{{ 0 }}</td>
+                    <td>{{ $data['rating'] }}</td>
                 </tr>
             @endforeach
             </tbody>

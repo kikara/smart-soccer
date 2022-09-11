@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Websocket;
 
+use App\Http\Controllers\Game\GamePoints;
 use App\Models\Game;
 use App\Models\GameRound;
 use App\Models\Round;
 use App\Models\TableOccupation;
+use App\Models\UserRating;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
@@ -18,6 +20,7 @@ class WebsocketRequestController extends Controller
             return ['data' => false];
         }
         $this->saveGameRounds($data);
+        $this->saveUserRating($data);
         $this->updateTableOccupation($data['table_occupation_id']);
         return ['data' => true];
     }
@@ -69,6 +72,29 @@ class WebsocketRequestController extends Controller
             $number++;
         }
     }
+
+    private function saveUserRating($data)
+    {
+        $firstRound = $data['rounds'][0];
+        $blueGamerID = (int) $firstRound['blue_gamer_id'];
+        $redGamerID = (int) $firstRound['red_gamer_id'];
+        $winnerID = (int) $data['game_winner_id'];
+        $blueGamerRatingRes = UserRating::where('user_id', '=', $blueGamerID)->limit(1)->first()?->toArray();
+        $blueGamerRating = $blueGamerRatingRes['rating'] ?? GamePoints::START_POINTS;
+        $redGamerRatingRes = UserRating::where('user_id', '=', $redGamerID)->limit(1)->first()?->toArray();
+        $redGamerRating = $redGamerRatingRes['rating'] ?? GamePoints::START_POINTS;
+        $winner = $winnerID === $redGamerID ? 1 : 2;
+        $scorePoints = GamePoints::scorePoints($redGamerRating, $blueGamerRating, $winner);
+        UserRating::updateOrCreate(
+            ['user_id' => $redGamerID],
+            ['rating' => $scorePoints[0]]
+        );
+        UserRating::updateOrCreate(
+            ['user_id' => $blueGamerID],
+            ['rating' => $scorePoints[1]]
+        );
+    }
+
 
     private function updateTableOccupation($tableOccupationID)
     {
