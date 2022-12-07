@@ -4,6 +4,7 @@ namespace App\Ratchet;
 
 use App\Models\GameSettingTemplate;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 
 
 class GameMessageHandler
@@ -13,26 +14,26 @@ class GameMessageHandler
     private Client $client;
     private const HOST = 'http://localhost';
 
-    public function __construct($message)
+    public function __construct(array $message)
     {
         $this->msg = $message;
         $this->cmd = $this->msg['cmd'] ?? '';
         $this->client = new Client();
     }
 
-    public static function handle(Game $game, $message)
+    public static function handle(Game $game, array $message): void
     {
         $handler = new self($message);
         $callback = GameCommand::getCallback($handler->cmd);
         $handler->$callback($game);
     }
 
-    public function test(Game $game)
-    {
-        $game->getCurrentRound()->test();
-    }
+//    public function test(Game $game): void
+//    {
+//        $game->getCurrentRound()->test();
+//    }
 
-    private function incrementValue(Game $game)
+    private function incrementValue(Game $game): void
     {
         if ($game->isGameStarted() && $game->isGameNotOver()) {
             if (! $game->isRoundEnd()) {
@@ -66,30 +67,32 @@ class GameMessageHandler
         }
     }
 
-    private function reset(Game $game)
+    private function reset(Game $game): void
     {
         if ($game->isGameStarted()) {
             $game->reset();
         }
     }
 
-    private function start(Game $game)
+    private function start(Game $game): void
     {
         $game->startGame();
     }
 
-    private function gamePrepare(Game $game)
+    /**
+     * @throws GuzzleException
+     * @throws \JsonException
+     */
+    private function gamePrepare(Game $game): void
     {
         if ($game->isGameStarted() || $game->isBusy()) {
             return;
         }
 
-        $templateRow = $this->getTemplateRowById($this->msg['t_id']);
-        $fromUserID = $this->getUserIdByTelegramChatId($this->msg['f']);
-        $recipientUserID = $this->getUserIdByTelegramChatId($this->msg['r']);
-        if (! $fromUserID || ! $recipientUserID || ! $templateRow) {
-            return;
-        }
+        $templateRow = $this->getTemplateRowById((int) $this->msg['t_id']);
+        $fromUserID = $this->getUserIdByTelegramChatId((int) $this->msg['f']);
+        $recipientUserID = $this->getUserIdByTelegramChatId((int) $this->msg['r']);
+
         $round = $game->getCurrentRound();
         if (GameSettingTemplate::isBlueSide($templateRow['side'])) {
             $round->setGamers($fromUserID, $recipientUserID);
@@ -105,51 +108,73 @@ class GameMessageHandler
         $this->setTableBusy($game, $fromUserID);
     }
 
-    private function notFound(Game $game)
+    /**
+     * @throws GuzzleException
+     * @throws \JsonException
+     */
+    private function getUserIdByTelegramChatId(int $chatId): int
     {
-        return;
-    }
-
-    private function getUserIdByTelegramChatId($chatId)
-    {
-        $response = $this->client->post($this->buildQuery('/api/bot/getUserIdByTelegramChatId'), [
-            'form_params' => ['chat_id' => $chatId],
-        ]);
-
-        if ($response->getStatusCode() !== 200) {
-            return false;
+        $response = $this->sendRequest('/api/bot/getUserIdByTelegramChatId', ['chat_id' => $chatId]);
+        if (! $response['user_id']) {
+            throw new \RuntimeException('can not get user id');
         }
-        $response = json_decode($response->getBody()->getContents(), true);
-        return $response['data'] ? $response['user_id'] : false;
+        return (int) $response['user_id'];
     }
 
-    private function getTemplateRowById($templateID)
+    /**
+     * @throws GuzzleException
+     * @throws \JsonException
+     */
+    private function getTemplateRowById(int $templateID): array
     {
-        $request = $this->client->post($this->buildQuery('/api/bot/getGameSettingsById'),[
-            'form_params' => ['template_id' => $templateID],
+        $response = $this->sendRequest('/api/bot/getGameSettingsById', ['template_id' => $templateID]);
+        if (! $response['settings']) {
+            throw new \RuntimeException('can not get settings');
+        }
+        return $response['settings'];
+    }
+
+    /**
+     * @throws GuzzleException
+     * @throws \JsonException
+     */
+    private function setTableBusy(Game $game, $fromUserID): void
+    {
+        $response = $this->sendRequest('/api/bot/setTableBusy', ['user_id' => $fromUserID]);
+        if ($response['data']) {
+            $game->setTableOccupationID($response['table_occupation_id']);
+        }
+    }
+
+    private function sendToSaveGame(Game $game): bool
+    {
+        $request = $this->client->post($this->buildQuery('/api/socket/saveGame'), [
+            'form_params' => $game->getState()
         ]);
+        return $request->getStatusCode() === 200;
+    }
+
+    /**
+     * @throws GuzzleException
+     * @throws \JsonException
+     */
+    private function sendRequest(string $url, array $params = []): array
+    {
+        $request = $this->client->post($this->buildQuery($url), [
+            'form_params' => $params
+        ]);
+
         if ($request->getStatusCode() !== 200) {
-            return false;
+            throw new \RuntimeException('request has an error ' . $request->getStatusCode());
         }
-        $response = $request->getBody()->getContents();
-        $jsonResponse = json_decode($response, true);
-        return $jsonResponse['data'] ? $jsonResponse['settings'] : false;
-    }
 
-    private function setTableBusy(Game $game, $fromUserID)
-    {
-        $request = $this->client->post($this->buildQuery('/api/bot/setTableBusy'), [
-            'form_params' => ['user_id' => $fromUserID]
-        ]);
-        if ($request->getStatusCode() !== 200) {
-            return false;
-        }
         $response = $request->getBody()->getContents();
-        $jsonResponse = json_decode($response, true);
-        if ($jsonResponse['data']) {
-            $game->setTableOccupationID($jsonResponse['table_occupation_id']);
+        $decoded = json_decode($response, true, 512, JSON_THROW_ON_ERROR);
+
+        if (! is_array($decoded)) {
+            throw new \RuntimeException('response cant decoded');
         }
-        return true;
+        return $decoded;
     }
 
     private function buildQuery(string $uri): string
@@ -157,14 +182,8 @@ class GameMessageHandler
         return self::HOST . $uri;
     }
 
-    private function sendToSaveGame(Game $game)
+    private function notFound(Game $game): void
     {
-        $request = $this->client->post($this->buildQuery('/api/socket/saveGame'), [
-            'form_params' => $game->getState()
-        ]);
-        if ($request->getStatusCode() !== 200) {
-            return false;
-        }
-        return true;
+        return;
     }
 }

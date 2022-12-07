@@ -17,13 +17,12 @@ class GameController extends Controller
 {
     public function index()
     {
-        $params = $this->getLastGames();
-        return view('game', $params);
+        return view('game', $this->getLastGames());
     }
 
     public function getMainLayout()
     {
-        $params['data'] = request()->all();
+        $params['data'] = request()?->all();
         $params['data']['blue_gamer_name'] = User::find($params['data']['round']['blue_gamer_id'])->toArray();
         $params['data']['red_gamer_name'] = User::find($params['data']['round']['red_gamer_id'])->toArray();
         $params['data']['rounds_count'] = $this->countRounds($params['data']);
@@ -44,53 +43,37 @@ class GameController extends Controller
         return view('game.new_table', $params);
     }
 
-    private function getLastGames()
+    private function getLastGames(): array
     {
-        $result['games'] = Game::limit(10)->orderBy('id', 'DESC')->get()?->toArray();
-        if (! empty($result['games'])) {
-            $result['games'] = array_reverse($result['games']);
-        }
-        $gamesID = [];
-        $userID = [];
-        foreach ($result['games'] as $game) {
-            $userID[] = $game['gamerOne'];
-            $userID[] = $game['gamerTwo'];
-            $gamesID[] = $game['id'];
+        $games = Game::limit(10)->orderBy('id', 'DESC')->get();
+        if (! $games) {
+            return ['games' => []];
         }
 
-        $gameRounds = GameRound::whereIn('gameId', $gamesID)->get()->toArray();
-        $roundsID = [];
-        foreach ($gameRounds as $gameRound) {
-            $roundsID[] = $gameRound['roundId'];
+        $usersId = [];
+        foreach ($games as $game) {
+            array_push($usersId, $game->gamerOne, $game->gamerTwo);
+        }
+        $users = $this->getUsers($usersId);
+
+        $rounds = $this->getGameRounds($games->modelKeys());
+        $gameRounds = [];
+        foreach ($rounds as $gameRound) {
+            $gameRounds[$gameRound->gameId][] = $gameRound->toArray();
         }
 
-        $result['rounds'] = $this->getRounds($roundsID);
-        $result['users'] = $this->getUsers($userID);
-
-        foreach ($gameRounds as $gameRound) {
-            $result['game_round'][$gameRound['gameId']][] = $result['rounds'][$gameRound['roundId']];
-        }
-
-        foreach ($result['games'] as $key => $game) {
-            $rounds = $result['game_round'][$game['id']];
+        foreach ($games as $game) {
+            $rounds = $gameRounds[$game->id];
             $account = GoalCount::getAccountOfGame($rounds);
-            $result['games'][$key]['account'] = $account;
 
-            $gamerOneCount = $account[$game['gamerOne']] ?? 0;
-            $gamerTwoCount = $account[$game['gamerTwo']] ?? 0;
-            $accountStr = $gamerOneCount . ' : ' . $gamerTwoCount;
-            $result['games'][$key]['accountStr'] = $accountStr;
-            $result['games'][$key]['time'] = $this->secondsToArray($game['totalTime']);
-            $result['games'][$key]['date'] = (new \DateTime($game['dateTime']))->format('d.m.Y H:i');
+            $game->gamerOneAccount = $account[$game->gamerOne] ?? 0;
+            $game->gamerTwoAccount = $account[$game->gamerTwo] ?? 0;
+            $game->gamerOneName = $users[$game->gamerOne]['login'];
+            $game->gamerTwoName = $users[$game->gamerTwo]['login'];
+            $game->totalTimeFormat = gmdate('H:i:s', $game->totalTime);
+            $game->date = $this->formatDate($game->dateTime);
         }
-        krsort($result['games']);
-        return $result;
-    }
-
-    private function getRounds(array $ids)
-    {
-        $rounds = Round::whereIn('id', $ids)->get()->toArray();
-        return $this->setKeys($rounds,'id');
+        return ['games' => $games];
     }
 
     private function setKeys($users, string $key)
@@ -106,16 +89,6 @@ class GameController extends Controller
     {
         $users = User::whereIn('id', $userID)->get()->toArray();
         return $this->setKeys($users, 'id');
-    }
-
-    private function secondsToArray(int $seconds)
-    {
-        $res = [];
-        $res['hours'] = floor($seconds / 3600);
-        $seconds = $seconds % 3600;
-        $res['minutes'] = floor($seconds / 60);
-        $res['secs'] = $seconds % 60;
-        return $res;
     }
 
     private function countRounds(array $data)
@@ -167,5 +140,22 @@ class GameController extends Controller
             $result[$userId]['event_sounds'] = $this->getEventSounds($userId);
         }
         return $result;
+    }
+
+    private function getGameRounds(array $modelKeys)
+    {
+        return GameRound::leftJoin('rounds', 'game_rounds.roundId', '=', 'rounds.id')
+            ->select(['rounds.*', 'game_rounds.gameId'])
+            ->whereIn('game_rounds.gameId', $modelKeys)
+            ->get();
+    }
+
+    private function formatDate(string $dateTime): string
+    {
+        try {
+            return (new \DateTime($dateTime))->format('d.m.Y H:i');
+        } catch (\Exception $exception) {
+            return '00:00:00';
+        }
     }
 }

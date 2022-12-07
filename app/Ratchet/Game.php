@@ -41,11 +41,6 @@ class Game
         $this->dateTime = new \DateTime();
     }
 
-    public static function newGame(): Game
-    {
-        return new self();
-    }
-
     public function incrementIndexRound()
     {
         $this->currentRound++;

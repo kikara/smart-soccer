@@ -16,11 +16,26 @@
             </tr>
             @foreach($games as $game)
                 <tr>
-                    <td>{{ $game['date'] }}</td>
-                    <td>{{ $users[$game['gamerOne']]['login'] }}</td>
-                    <td>{{ $users[$game['gamerTwo']]['login'] }}</td>
-                    <td>{{ $game['time']['minutes'] . ' : ' . $game['time']['secs'] }}</td>
-                    <td>{{ $game['accountStr'] }}</td>
+                    <td>{{ $game->date }}</td>
+                    <td>
+                        <div class="d-flex justify-content-center align-items-center gap-2">
+                            @if($game->winner === $game->gamerOne)
+                                <img src="{{ asset('images/crown.svg') }}" alt="winner" width="25px">
+                            @endif
+                            <span>{{ $game->gamerOneName }}</span>
+                        </div>
+
+                    </td>
+                    <td>
+                        <div class="d-flex justify-content-center">
+                            @if($game->winner === $game->gamerTwo)
+                                <img src="{{ asset('images/crown.svg') }}" alt="">
+                            @endif
+                            <span>{{ $game->gamerTwoName }}</span>
+                        </div>
+                    </td>
+                    <td>{{ $game->totalTimeFormat }}</td>
+                    <td>{{ $game->gamerOneAccount . ' : ' . $game->gamerTwoAccount }}</td>
                 </tr>
             @endforeach
         </table>

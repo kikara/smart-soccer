@@ -13,24 +13,20 @@ export default function Debug () {
         This.onMessage();
         This.onError();
         This.onClose();
-        This.connect();
     }
 
     this.buttons = function () {
+        // This.connect();
         This.onPrepareGame();
         This.onStartGame();
         This.onRedGoalButton();
         This.onBlueGoalButton();
-        This.onTestGoalButton();
+        onResetButton();
+        onDoneButton();
+        // This.onTestGoalButton();
     }
 
-    this.tryToConnect = function () {
-        try {
-            This.conn = new WebSocket(WS_HOST);
-        } catch (e) {
-            console.log('Соединение не установлено');
-        }
-    }
+    this.tryToConnect = () => This.conn = new WebSocket(WS_HOST);
 
     this.onOpen = function () {
         This.conn.onopen = function () {
@@ -53,6 +49,7 @@ export default function Debug () {
     this.onClose = function () {
         this.conn.onclose = function () {
             console.log('connection closed');
+            setTimeout(This.socketInit, 2000);
         }
     }
 
@@ -97,27 +94,39 @@ export default function Debug () {
         });
     }
 
-    this.onTestGoalButton = function () {
-        This.$container.on('click', '.js-test', function () {
-            let data = {'cmd': 'test'}
-            This.send(data);
+    const onResetButton = () => {
+        This.$container.on('click', '.js-reset', () => {
+            This.send({cmd: 'reset'});
         });
     }
 
-    this.connect = function () {
-        This.$container.on('click', '.js-connect', function () {
-            console.log('try to connect');
-            This.tryToConnect();
+    const onDoneButton = () => {
+        This.$container.on('click', '.js-done', () => {
+            console.log('done button');
         });
     }
 
-    this.isOpen = function () {
-        return This.conn.readyState === 1;
-    }
+    // this.onTestGoalButton = function () {
+    //     This.$container.on('click', '.js-test', function () {
+    //         let data = {'cmd': 'test'}
+    //         This.send(data);
+    //     });
+    // }
+
+    // this.connect = function () {
+    //     This.$container.on('click', '.js-connect', function () {
+    //         console.log('try to connect');
+    //         This.socketInit();
+    //     });
+    // }
 
     this.send = function (data) {
         if (This.isOpen()) {
             This.conn.send(JSON.stringify(data));
         }
+    }
+
+    this.isOpen = function () {
+        return This.conn.readyState === 1;
     }
 }

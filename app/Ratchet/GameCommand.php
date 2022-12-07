@@ -9,7 +9,7 @@ class GameCommand
         'reset' => 'reset',
         'start' => 'start',
         'prepare' => 'gamePrepare',
-        'test' => 'test',
+//        'test' => 'test',
     ];
 
     public static function getCallback(string $cmd)

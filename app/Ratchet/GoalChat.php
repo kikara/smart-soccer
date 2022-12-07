@@ -2,6 +2,8 @@
 
 namespace App\Ratchet;
 
+use Exception;
+use JsonException;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
 
@@ -9,63 +11,102 @@ class GoalChat implements MessageComponentInterface
 {
     protected \SplObjectStorage $clients;
     private Game $game;
+    private array $payload = [];
 
     public function __construct() {
         $this->clients = new \SplObjectStorage;
-        $this->game = Game::newGame();
+        $this->game = new Game();
     }
 
-    public function onOpen(ConnectionInterface $conn)
+    public function onOpen(ConnectionInterface $conn): void
     {
         $this->clients->attach($conn);
     }
 
-    public function onMessage(ConnectionInterface $from, $msg)
+    public function onMessage(ConnectionInterface $from, $msg): void
     {
-        $decoded = json_decode($msg, true);
-        $callback = $this->getCallback($decoded['cmd']);
-        $this->$callback($decoded);
-        $encoded = json_encode($this->game->getState());
-        if ($this->isGetStateCmd($decoded['cmd'])) {
-            $from->send($encoded);
-        } else {
-            foreach ($this->clients as $client) {
-                $client->send($encoded);
-            }
-        }
-        if ($this->game->isGameOver()) {
-            $this->game = Game::newGame();
+        try {
+            $this->runAction($msg);
+            $this->publishInfo($from);
+            $this->checkForGameOver();
+        } catch (Exception $exception) {
+            var_dump($exception->getMessage());
         }
     }
 
-    public function onClose(ConnectionInterface $conn)
+    /**
+     * @throws JsonException
+     */
+    private function runAction(string $msg): void
     {
-        $this->clients->detach($conn);
+        $this->setPayload($msg);
+        $callback = $this->getCallback();
+        $this->$callback();
     }
 
-    public function onError(ConnectionInterface $conn, \Exception $e)
+    private function handle(): void
     {
-        $conn->close();
+        GameMessageHandler::handle($this->game, $this->payload);
     }
 
-    private function handle($decoded)
+    private function createNewGame(): void
     {
-        GameMessageHandler::handle($this->game, $decoded);
+        $this->game = new Game();
     }
 
-    private function createNewGame($decoded)
+    private function getCallback(): string
     {
-        $this->game = Game::newGame();
-    }
-
-    private function getCallback($cmd): string
-    {
+        $cmd = $this->payload['cmd'];
         $callbacks = ['new_game' => 'createNewGame'];
         return $callbacks[$cmd] ?? 'handle';
     }
 
-    private function isGetStateCmd($cmd): bool
+    /**
+     * @throws JsonException
+     */
+    private function publishInfo(ConnectionInterface $from): void
     {
-        return $cmd === 'state';
+        $encoded = json_encode($this->game->getState(), JSON_THROW_ON_ERROR);
+        if ($this->isGetStateCmd()) {
+            $from->send($encoded);
+            return;
+        }
+        foreach ($this->clients as $client) {
+            $client->send($encoded);
+        }
+    }
+
+    /**
+     * @throws JsonException
+     */
+    private function setPayload(string $msg): void
+    {
+        $decoded = json_decode($msg, true, 512, JSON_THROW_ON_ERROR);
+        if (! is_array($decoded)) {
+            throw new \RuntimeException('message can not decoded');
+        }
+        $this->payload = $decoded;
+    }
+
+    private function isGetStateCmd(): bool
+    {
+        return $this->payload['cmd'] === 'state';
+    }
+
+    private function checkForGameOver(): void
+    {
+        if ($this->game->isGameOver()) {
+            $this->game = new Game();
+        }
+    }
+
+    public function onClose(ConnectionInterface $conn): void
+    {
+        $this->clients->detach($conn);
+    }
+
+    public function onError(ConnectionInterface $conn, \Exception $e): void
+    {
+        $conn->close();
     }
 }

@@ -88,7 +88,7 @@ class BotRequestController extends Controller
         return $resultData;
     }
 
-    public function getGameSettingsById()
+    public function getGameSettingsById(): array
     {
         $data = request()?->all();
         if (empty($data)) {
