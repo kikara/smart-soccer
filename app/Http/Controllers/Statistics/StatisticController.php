@@ -40,7 +40,7 @@ class StatisticController extends Controller
             $temp['count_goals'] = $roundParams['count_goals'][$user['id']] ?? 0;
             $temp['missed_goals'] = $roundParams['missed_goals'][$user['id']] ?? 0;
             $temp['total_time'] = $this->formatTime($gamesParams['total_time'][$user['id']] ?? 0);
-            $temp['rating'] = (int) $ratingParams[$user['id']];
+            $temp['rating'] = (int) ($ratingParams[$user['id']] ?? 0);
             $tableData[] = $temp;
         }
         usort($tableData, function ($a, $b) {
@@ -88,8 +88,8 @@ class StatisticController extends Controller
             $result['count_games'][$game['gamerOne']] = $this->increment($result['count_games'][$game['gamerOne']] ?? 0);
             $result['count_games'][$game['gamerTwo']] = $this->increment($result['count_games'][$game['gamerTwo']] ?? 0);
             $result['winner'][$game['winner']] = $this->increment($result['winner'][$game['winner']] ?? 0);
-            $result['total_time'][$game['gamerOne']] = $this->increment($game['totalTime'] ?? 0);
-            $result['total_time'][$game['gamerTwo']] = $this->increment($game['totalTime'] ?? 0);
+            $result['total_time'][$game['gamerOne']] = $this->increment($result['total_time'][$game['gamerOne']] ?? 0, $game['totalTime'] ?? 0);
+            $result['total_time'][$game['gamerTwo']] = $this->increment($result['total_time'][$game['gamerTwo']] ?? 0, $game['totalTime'] ?? 0);
         }
         return $result;
     }
