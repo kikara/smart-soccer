@@ -29,7 +29,7 @@
                     <td>
                         <div class="d-flex justify-content-center">
                             @if($game->winner === $game->gamerTwo)
-                                <img src="{{ asset('images/crown.svg') }}" alt="">
+                                <img src="{{ asset('images/crown.svg') }}" alt="winner" width="25px">
                             @endif
                             <span>{{ $game->gamerTwoName }}</span>
                         </div>
