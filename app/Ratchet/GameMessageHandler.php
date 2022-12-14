@@ -74,6 +74,13 @@ class GameMessageHandler
         }
     }
 
+    private function resetLastGoal(Game $game): void
+    {
+        if ($game->isGameStarted()) {
+            $game->resetLastGoal();
+        }
+    }
+
     private function start(Game $game): void
     {
         $game->startGame();

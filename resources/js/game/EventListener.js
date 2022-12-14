@@ -4,7 +4,7 @@ export default function EventListener() {
     let blueCount = 0;
     let redCount = 0;
     let isGameStarted = false;
-    let isGameOver = false;
+    // let isGameOver = false;
     let tableOccupied = false;
 
     let subscribers = {};
@@ -16,10 +16,6 @@ export default function EventListener() {
      * goal - гол
      * gameOver - игра закончилась
      */
-
-    this.init = function () {
-
-    }
 
     this.handle = function (json) {
         This.onTableOccupied(json);
@@ -44,8 +40,9 @@ export default function EventListener() {
     };
 
     this.onGoal = function (json) {
-        let blue = parseInt(json['round']['blue_count']);
-        let red = parseInt(json['round']['red_count']);
+        const blue = parseInt(json['round']['blue_count']);
+        const red = parseInt(json['round']['red_count']);
+
         if ((blue !== blueCount || red !== redCount) && ! json['events']['is_new_round']) {
             if (! json['game_over']) {
                 This.notify('goal', json);

@@ -23,6 +23,7 @@ export default function Debug () {
         This.onBlueGoalButton();
         onResetButton();
         onDoneButton();
+        onResetLastGoal();
         // This.onTestGoalButton();
     }
 
@@ -36,7 +37,8 @@ export default function Debug () {
 
     this.onMessage = function () {
         This.conn.onmessage = function (e) {
-            console.log(e.data);
+            const message = JSON.parse(e.data);
+            console.log(message);
         }
     }
 
@@ -103,6 +105,12 @@ export default function Debug () {
     const onDoneButton = () => {
         This.$container.on('click', '.js-done', () => {
             console.log('done button');
+        });
+    }
+
+    const onResetLastGoal = () => {
+        This.$container.on('click', '.js-reset-last', function () {
+            This.send({cmd: 'reset_last_goal'});
         });
     }
 

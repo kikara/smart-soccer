@@ -27,6 +27,8 @@ class Game
 
     private int $tableOccupationID = 0;
 
+    private array $states = [];
+
     /**
      * @var Round[]
      */
@@ -41,12 +43,12 @@ class Game
         $this->dateTime = new \DateTime();
     }
 
-    public function incrementIndexRound()
+    public function incrementIndexRound(): void
     {
         $this->currentRound++;
     }
 
-    public function addRound(Round $round)
+    public function addRound(Round $round): void
     {
         $this->rounds[] = $round;
     }
@@ -66,17 +68,17 @@ class Game
         return $this->isSideChange;
     }
 
-    public function incrementBlueTeam()
+    public function incrementBlueTeam(): void
     {
         $this->getCurrentRound()->incrementBlue();
     }
 
-    public function incrementRedTeam()
+    public function incrementRedTeam(): void
     {
         $this->getCurrentRound()->incrementRed();
     }
 
-    public function startGame()
+    public function startGame(): void
     {
         $this->startGameTime = time();
         $this->dateTime->setTimestamp($this->startGameTime);
@@ -88,7 +90,7 @@ class Game
         return $this->isGameStarted;
     }
 
-    public function stopGame()
+    public function stopGame(): void
     {
         $this->isGameStarted = false;
     }
@@ -114,25 +116,29 @@ class Game
             $res['template_id'] = $this->gameSettingTemplateID;
             $res['table_occupation_id'] = $this->tableOccupationID;
         }
+        foreach ($this->states as $key => $state) {
+            $res[$key] = $state;
+        }
+        $this->states = [];
         return $res;
     }
 
-    public function setGameMode(string $mode)
+    public function setGameMode(string $mode): void
     {
         $this->mode = $mode;
     }
 
-    public function setSideChange()
+    public function setSideChange(): void
     {
         $this->isSideChange = true;
     }
 
-    public function reset()
+    public function reset(): void
     {
         $this->getCurrentRound()->reset();
     }
 
-    public function setBusy()
+    public function setBusy(): void
     {
         $this->isBusy = true;
     }
@@ -152,7 +158,7 @@ class Game
         return ! $this->isGameOver;
     }
 
-    public function checkForGameOver()
+    public function checkForGameOver(): void
     {
         if (count($this->rounds) >= self::GAME_WIN_COUNT) {
             $gamersCountRound['blue'] = 0;
@@ -160,9 +166,9 @@ class Game
             $blueGamer = $this->getCurrentRound()->getBlueGamerID();
             foreach ($this->rounds as $round) {
                 if ($blueGamer === $round->getWinnerID()) {
-                    $gamersCountRound['blue'] += 1;
+                    ++$gamersCountRound['blue'];
                 } else {
-                    $gamersCountRound['red'] += 1;
+                    ++$gamersCountRound['red'];
                 }
                 if ($gamersCountRound['blue'] === self::GAME_WIN_COUNT) {
                     $this->winnerID = $blueGamer;
@@ -178,7 +184,7 @@ class Game
         }
     }
 
-    public function setGameSettingTemplate($templateID)
+    public function setGameSettingTemplate($templateID): void
     {
         $this->gameSettingTemplateID = (int) $templateID;
     }
@@ -197,7 +203,7 @@ class Game
         return $result;
     }
 
-    private function gameOver()
+    private function gameOver(): void
     {
         $this->isGameOver = true;
         $this->endGameTime = time();
@@ -208,12 +214,12 @@ class Game
         return $this->endGameTime - $this->startGameTime;
     }
 
-    private function getEvents()
+    private function getEvents(): array
     {
         return GameEvents::getGameEvents($this);
     }
 
-    public function setTableOccupationID($id)
+    public function setTableOccupationID($id): void
     {
         $this->tableOccupationID = (int) $id;
     }
@@ -237,5 +243,10 @@ class Game
             return true;
         }
         return false;
+    }
+
+    public function resetLastGoal(): void
+    {
+        $this->getCurrentRound()->deleteLastGoal();
     }
 }

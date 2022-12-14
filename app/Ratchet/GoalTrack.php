@@ -7,65 +7,79 @@ namespace App\Ratchet;
  */
 class GoalTrack
 {
-    private int $goalScoredUserID = 0;
-    private int $goalMissedUserID = 0;
     private int $goalScoredCount = 0;
     private int $goalMissedCount = 0;
 
-//    private int $goalsScoredCount = 0;
-//    private int $goalsMissedCount = 0;
-    private int $goalCount = 0;
+    private array $stack = [];
 
-    public function updateScore(int $scoredUserID, int $missedUserID)
+    public function updateScore(int $scoredUserID, int $missedUserID): void
     {
-        if ($scoredUserID === $this->goalScoredUserID) {
-            $this->goalCount++;
-        } else {
-            $this->goalScoredUserID = $scoredUserID;
-//            $this->goalsScoredCount = 1;
-            $this->goalCount = 1;
+        $this->stack[] = [
+            'scored' => $scoredUserID,
+            'missed' => $missedUserID,
+        ];
+    }
+
+    public function getGoalScoredUserId(): int
+    {
+        $item = $this->getCurrentItem();
+        return $item['scored'];
+    }
+
+    public function getGoalMissedId(): int
+    {
+        $item = $this->getCurrentItem();
+        return $item['missed'];
+    }
+
+    public function getGoalCount(): int
+    {
+        $currentItem = $this->getCurrentItem();
+
+        $count = 0;
+        $reversed = array_reverse($this->stack);
+        foreach ($reversed as $item) {
+            if ($currentItem['scored'] !== $item['scored']) {
+                break;
+            }
+            $count++;
         }
-
-        if ($missedUserID !== $this->goalMissedUserID) {
-            $this->goalMissedUserID = $missedUserID;
-        }
-    }
-
-    public function getGoalScored()
-    {
-        return $this->goalScoredUserID;
-    }
-
-    public function getGoalMissed()
-    {
-        return $this->goalMissedUserID;
-    }
-
-    public function getGoalCount()
-    {
-        return $this->goalCount;
+        return $count;
     }
 
     /**
      * Счет того кто забил
      */
-    public function setScoredCount($count)
+    public function setScoredCount($count): void
     {
         $this->goalScoredCount = (int) $count;
     }
 
-    public function getScoredCount()
+    public function getScoredCount(): int
     {
         return $this->goalScoredCount;
     }
 
-    public function setMissedCount($count)
+    public function setMissedCount($count): void
     {
         $this->goalMissedCount = (int) $count;
     }
 
-    public function getMissedCount()
+    public function getMissedCount(): int
     {
         return $this->goalMissedCount;
+    }
+
+    public function deleteLastGoal(): void
+    {
+        array_pop($this->stack);
+    }
+
+    private function getCurrentItem(): ?array
+    {
+        if (! empty($this->stack)) {
+            return $this->stack[array_key_last($this->stack)];
+        }
+        return ['scored' => 0, 'missed' => 0];
     }
 }

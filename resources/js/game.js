@@ -1,3 +1,5 @@
+import EventListener from "./game/EventListener";
+import AudioEventListener from "./game/AudioEventListener";
 export default function Game() {
     let This = this;
 
@@ -7,10 +9,7 @@ export default function Game() {
         This.audioEventListenerInit();
         This.startTime = 0;
         This.contentLoaded = false;
-        This.tryToConnect();
-        This.onOpen();
-        This.onMessage();
-        This.onClose();
+        socketInit();
     }
 
     this.eventListenerInit = function () {
@@ -19,7 +18,6 @@ export default function Game() {
         This.eventListener.addEventListener('gameStarted', This.onGameStarted);
         This.eventListener.addEventListener('newRound', This.onRoundEndSideChange);
         This.eventListener.addEventListener('gameOver', This.onGameOver);
-        This.eventListener.addEventListener('goal', This.onGoal);
     }
 
     this.audioEventListenerInit = function () {
@@ -30,6 +28,13 @@ export default function Game() {
         This.eventListener.addEventListener('newRound', This.audioEventListener.onNewRound);
         This.eventListener.addEventListener('gameStarted', This.audioEventListener.onRoundOne);
         This.eventListener.addEventListener('gameOver', This.audioEventListener.onGameOver);
+    }
+
+    const socketInit = () => {
+        This.tryToConnect();
+        This.onOpen();
+        This.onMessage();
+        This.onClose();
     }
 
     this.tryToConnect = function () {
@@ -45,8 +50,9 @@ export default function Game() {
 
     this.onMessage = function () {
         This.conn.onmessage = function (e) {
-            let json = JSON.parse(e.data);
+            const json = JSON.parse(e.data);
             This.eventListener.handle(json);
+            This.onGoal(json);
         }
     }
 
@@ -63,6 +69,7 @@ export default function Game() {
     this.onClose = function () {
         This.conn.onclose = function (e) {
             console.log('connection closed');
+            setTimeout(socketInit, 2000);
         }
     }
 

@@ -9,6 +9,7 @@ class GameCommand
         'reset' => 'reset',
         'start' => 'start',
         'prepare' => 'gamePrepare',
+        'reset_last_goal' => 'resetLastGoal',
 //        'test' => 'test',
     ];
 

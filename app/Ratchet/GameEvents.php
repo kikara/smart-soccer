@@ -7,16 +7,15 @@ class GameEvents
     private Game $game;
     private array $currentRoundState;
 
-    public function __construct(Game $game)
-    {
-        $this->game = clone $game;
-        $this->currentRoundState = $this->game->getCurrentRound()->getState();
-    }
-
     public static function getGameEvents(Game $game): array
     {
-        $gameEvents = new self($game);
-        return $gameEvents->getEvents();
+        return (new self($game))->getEvents();
+    }
+
+    public function __construct(Game $game)
+    {
+        $this->game = $game;
+        $this->currentRoundState = $this->game->getCurrentRound()->getState();
     }
 
     private function getEvents(): array
@@ -26,7 +25,7 @@ class GameEvents
             'is_new_round' => $this->isNewRound(),
             'goal_scored' => $this->goalScored(),
             'goal_missed' => $this->goalMissed(),
-            'goal_count' => $this->goalCountContinious(),
+            'goal_count' => $this->goalCountContinuous(),
             'goal_scored_count' => $this->goalScoredCount(),
             'opponent-score' => $this->goalMissedCount(),
         ];
@@ -34,12 +33,9 @@ class GameEvents
 
     private function isNewRound(): bool
     {
-        if ($this->game->isGameStarted()) {
-            if ($this->currentRoundState['blue_count'] === 0 && $this->currentRoundState['red_count'] === 0) {
-                return true;
-            }
-        }
-        return false;
+        return $this->game->isGameStarted()
+            && $this->currentRoundState['blue_count'] === 0
+            && $this->currentRoundState['red_count'] === 0;
     }
 
     private function isTableBusy(): bool
@@ -47,30 +43,30 @@ class GameEvents
         return ! $this->game->isGameStarted() && $this->game->isBusy();
     }
 
-    private function goalScored()
+    private function goalScored(): int
     {
-        return $this->game->getCurrentRound()->goalTrack->getGoalScored();
+        return $this->game->getCurrentRound()->goalTrack->getGoalScoredUserId();
     }
 
-    private function goalMissed()
+    private function goalMissed(): int
     {
-        return $this->game->getCurrentRound()->goalTrack->getGoalMissed();
+        return $this->game->getCurrentRound()->goalTrack->getGoalMissedId();
     }
 
     /**
      * @return int Какой подряд(непрерывно) идет мяч забитый, пропущенный
      */
-    private function goalCountContinious()
+    private function goalCountContinuous(): int
     {
         return $this->game->getCurrentRound()->goalTrack->getGoalCount();
     }
 
-    private function goalScoredCount()
+    private function goalScoredCount(): int
     {
         return $this->game->getCurrentRound()->goalTrack->getScoredCount();
     }
 
-    private function goalMissedCount()
+    private function goalMissedCount(): int
     {
         return $this->game->getCurrentRound()->goalTrack->getMissedCount();
     }
