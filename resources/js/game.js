@@ -52,7 +52,7 @@ export default function Game() {
         This.conn.onmessage = function (e) {
             const json = JSON.parse(e.data);
             This.eventListener.handle(json);
-            This.onGoal(json);
+            // This.onGoal(json);
         }
     }
 
