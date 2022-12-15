@@ -24,6 +24,7 @@ class GameMessageHandler
     public static function handle(Game $game, array $message): void
     {
         $handler = new self($message);
+        custom_log($handler->cmd, true);
         $callback = GameCommand::getCallback($handler->cmd);
         $handler->$callback($game);
     }
