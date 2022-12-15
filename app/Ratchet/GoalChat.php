@@ -30,7 +30,7 @@ class GoalChat implements MessageComponentInterface
             $this->publishInfo($from);
             $this->checkForGameOver();
         } catch (Exception $exception) {
-            var_dump($exception->getMessage());
+            custom_log($exception->getMessage() . ' in line ' . $exception->getLine(), true);
         }
     }
 
