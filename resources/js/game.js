@@ -18,6 +18,7 @@ export default function Game() {
         This.eventListener.addEventListener('gameStarted', This.onGameStarted);
         This.eventListener.addEventListener('newRound', This.onRoundEndSideChange);
         This.eventListener.addEventListener('gameOver', This.onGameOver);
+        This.eventListener.addEventListener('count_changed', This.onGoal);
     }
 
     this.audioEventListenerInit = function () {

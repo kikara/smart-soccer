@@ -43,9 +43,12 @@ export default function EventListener() {
         const blue = parseInt(json['round']['blue_count']);
         const red = parseInt(json['round']['red_count']);
 
-        if ((blue !== blueCount || red !== redCount) && ! json['events']['is_new_round']) {
-            if (! json['game_over']) {
-                This.notify('goal', json);
+        if ((blue !== blueCount || red !== redCount)) {
+            if (!json['game_over']) {
+                if (!json['events']['is_new_round']) {
+                    This.notify('goal', json);
+                }
+                This.notify('count_changed', json);
             }
         }
         blueCount = blue;
