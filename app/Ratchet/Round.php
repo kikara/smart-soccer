@@ -99,7 +99,7 @@ class Round
             $this->{$scored['count']}++;
         }
         if ($this->{$scored['count']} === self::MAX_COUNT) {
-            $this->winnerID = $this->$scored['gamer'];
+            $this->winnerID = $this->{$scored['gamer']};
             $this->roundEnd = true;
         }
         $this->goalTrack->setScoredCount($this->{$scored['count']});
