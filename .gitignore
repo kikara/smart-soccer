@@ -24,3 +24,5 @@ error.log
 /mariadb-data
 /pma-data
 /logs
+/public/css/app.css
+/public/js/app.js
