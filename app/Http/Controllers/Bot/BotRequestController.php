@@ -111,7 +111,7 @@ class BotRequestController extends Controller
             return ['data' => false];
         }
         $userChatId = $data['chat_id'];
-        $user = User::where('telegram_chat_id', $userChatId)->first()->toArray();
+        $user = User::where('telegram_chat_id', $userChatId)->first()?->toArray();
         if ($user['id']) {
             return [
                 'data' => true,
