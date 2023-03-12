@@ -25,7 +25,7 @@ services:
             - db
         container_name: soccer_app
         ports:
-            - "8000:8000"
+            - "8776:8080"
 
     db:
         image: mariadb
