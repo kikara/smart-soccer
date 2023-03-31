@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Bot;
 use App\Models\GameSettingTemplate;
 use App\Models\TableOccupation;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
@@ -88,57 +89,19 @@ class BotRequestController extends Controller
         return $resultData;
     }
 
-    public function getGameSettingsById(): array
+    public function getGameSettingsById(int $settingId)
     {
-        $data = request()?->all();
-        if (empty($data)) {
-            return ['data' => false];
-        }
-        $templateRow = GameSettingTemplate::find($data['template_id'])?->toArray();
-        if (empty($templateRow)) {
-            return ['data' => false];
-        }
-        return [
-            'data' => true,
-            'settings' => $templateRow
-        ];
+        return GameSettingTemplate::findOrFail($settingId);
     }
 
-    public function getUserIdByTelegramChatId()
+    public function getUserIdByTelegramChatId(int $chatId): JsonResponse
     {
-        $data = request()?->all();
-        if (empty($data)) {
-            return ['data' => false];
-        }
-        $userChatId = $data['chat_id'];
-        $user = User::where('telegram_chat_id', $userChatId)->first()?->toArray();
-        if ($user['id']) {
-            return [
-                'data' => true,
-                'user_id' => $user['id'],
-            ];
-        }
-        return ['data' => false];
-    }
+        $user = User::where('telegram_chat_id', $chatId)->firstOrFail();
 
-    public function setTableBusy()
-    {
-        $data = request()?->all();
-        if (empty($data)) {
-            return ['data' => false];
-        }
-        $dateTime = new \DateTime();
-        $startGame = $dateTime->format('Y-m-d H:i:s');
-        $endGame = $dateTime->modify('+60 minutes')->format('Y-m-d H:i:s');
-        $tableOccupationID = TableOccupation::create([
-            'start_game' => $startGame,
-            'end_game' => $endGame,
-            'user_id' => $data['user_id']
+        return response()->json([
+            'id' => $user->id,
+            'login' => $user->login,
         ]);
-        return [
-            'data' => true,
-            'table_occupation_id' => $tableOccupationID->id,
-        ];
     }
 
     public function isTableOccupied(): array

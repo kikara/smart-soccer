@@ -3,19 +3,20 @@
 namespace App\Ratchet;
 
 use Exception;
-use JsonException;
+use Illuminate\Support\Facades\Log;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
 
 class GoalChat implements MessageComponentInterface
 {
     protected \SplObjectStorage $clients;
-    private Game $game;
-    private array $payload = [];
+    protected Game $game;
+    protected GameMessageHandler $handler;
 
     public function __construct() {
         $this->clients = new \SplObjectStorage;
         $this->game = new Game();
+        $this->handler = new GameMessageHandler();
     }
 
     public function onOpen(ConnectionInterface $conn): void
@@ -26,48 +27,36 @@ class GoalChat implements MessageComponentInterface
     public function onMessage(ConnectionInterface $from, $msg): void
     {
         try {
-            $this->runAction($msg);
-            $this->publishInfo($from);
+            $payload = $this->runAction($msg);
+//            var_dump($payload);
+            $this->publishInfo($from, $payload);
             $this->checkForGameOver();
         } catch (Exception $exception) {
-            custom_log($exception->getMessage() . ' in line ' . $exception->getLine(), true);
+//            Log::log('DEBUG', $exception->getMessage());
+//            Log::log('DEBUG', var_export($msg, true));
+            var_dump($exception->getMessage());
+            var_dump($exception->getLine());
+
         }
     }
 
-    /**
-     * @throws JsonException
-     */
-    private function runAction(string $msg): void
+    private function runAction(string $msg): array
     {
-        $this->setPayload($msg);
-        $callback = $this->getCallback();
-        $this->$callback();
+        $data = $this->getPayload($msg);
+
+        if (empty($data) || empty($data['cmd'])) {
+            throw new \RuntimeException('CMD is not defined');
+        }
+
+        $this->handler->handleMessage($this->game, $data);
+
+        return $data;
     }
 
-    private function handle(): void
+    private function publishInfo(ConnectionInterface $from, array $payload): void
     {
-        GameMessageHandler::handle($this->game, $this->payload);
-    }
-
-    private function createNewGame(): void
-    {
-        $this->game = new Game();
-    }
-
-    private function getCallback(): string
-    {
-        $cmd = $this->payload['cmd'];
-        $callbacks = ['new_game' => 'createNewGame'];
-        return $callbacks[$cmd] ?? 'handle';
-    }
-
-    /**
-     * @throws JsonException
-     */
-    private function publishInfo(ConnectionInterface $from): void
-    {
-        $encoded = json_encode($this->game->getState(), JSON_THROW_ON_ERROR);
-        if ($this->isGetStateCmd()) {
+        $encoded = json_encode($this->game->getState());
+        if ($payload['cmd'] === 'state') {
             $from->send($encoded);
             return;
         }
@@ -76,21 +65,14 @@ class GoalChat implements MessageComponentInterface
         }
     }
 
-    /**
-     * @throws JsonException
-     */
-    private function setPayload(string $msg): void
+    private function getPayload(string $msg): array
     {
-        $decoded = json_decode($msg, true, 512, JSON_THROW_ON_ERROR);
-        if (! is_array($decoded)) {
-            throw new \RuntimeException('message can not decoded');
+        try {
+            $decoded = json_decode($msg, true, 512, JSON_THROW_ON_ERROR);
+        } catch (Exception $exception) {
+            $decoded = [];
         }
-        $this->payload = $decoded;
-    }
-
-    private function isGetStateCmd(): bool
-    {
-        return $this->payload['cmd'] === 'state';
+        return $decoded;
     }
 
     private function checkForGameOver(): void

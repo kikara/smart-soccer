@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\Bot\BotRequestController;
+use App\Http\Controllers\Game\GameController;
+use App\Http\Controllers\Game\TableOccupationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -32,22 +35,25 @@ Route::group(['namespace' => 'Game'], function () {
     Route::post('/getGamersAudio', 'GameController@getGamersAudio');
 });
 
-Route::group(['namespace' => 'Bot'], function () {
-    Route::prefix('/bot')->group(function () {
-        Route::post('/getGamers', 'BotRequestController@getGamers');
-        Route::post('/saveTelegramData', 'BotRequestController@saveTelegramData');
-        Route::post('/getGameSettings', 'BotRequestController@getGameSettings');
-        Route::post('/checkUser', 'BotRequestController@checkTelegramUser');
-        Route::post('/saveGameSettings', 'BotRequestController@saveGameSettings');
-        Route::post('/getGameSettingsById', 'BotRequestController@getGameSettingsById');
-        Route::post('/getUserIdByTelegramChatId', 'BotRequestController@getUserIdByTelegramChatId');
-        Route::post('/setTableBusy', 'BotRequestController@setTableBusy');
-        Route::post('/isTableOccupied', 'BotRequestController@isTableOccupied');
-    });
+Route::group(['prefix' => '/bot'], function () {
+    Route::get('/settings/{settingId}', [BotRequestController::class, 'getGameSettingsById']);
+
+    Route::post('/occupations', [TableOccupationController::class, 'store']);
+
+    Route::get('/telegrams/{chatId}/user', [BotRequestController::class, 'getUserIdByTelegramChatId']);
+
+//    Route::post('/getUserIdByTelegramChatId', 'BotRequestController@getUserIdByTelegramChatId');
+//    Route::post('/setTableBusy', 'BotRequestController@setTableBusy');
+//    Route::post('/getGameSettingsById', 'BotRequestController@getGameSettingsById');
+
+    Route::post('/getGamers', 'BotRequestController@getGamers');
+    Route::post('/saveTelegramData', 'BotRequestController@saveTelegramData');
+    Route::post('/getGameSettings', 'BotRequestController@getGameSettings');
+    Route::post('/checkUser', 'BotRequestController@checkTelegramUser');
+    Route::post('/saveGameSettings', 'BotRequestController@saveGameSettings');
+    Route::post('/isTableOccupied', 'BotRequestController@isTableOccupied');
 });
 
-Route::group(['namespace' => 'Websocket'], function () {
-    Route::prefix('/socket')->group(function () {
-        Route::post('/saveGame', 'WebsocketRequestController@saveGame');
-    });
+Route::group(['prefix' => '/socket'], function () {
+    Route::post('/game', [GameController::class, 'store']);
 });

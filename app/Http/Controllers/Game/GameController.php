@@ -3,21 +3,32 @@
 namespace App\Http\Controllers\Game;
 
 use \App\Http\Controllers\Controller;
-use App\Models\Game;
-use App\Models\GameRound;
-use App\Models\GameSettingTemplate;
-use App\Models\Round;
+use App\Http\Requests\GameRequest;
+use App\Http\Resources\GameResource;
 use App\Models\TableOccupation;
 use App\Models\User;
 use App\Models\UserAudioEvent;
 use App\Models\UserSingleAudio;
+use App\Resources\GameRepository;
 use Illuminate\Http\Request;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\Response;
 
 class GameController extends Controller
 {
-    public function index()
+    public function index(): View
     {
-        return view('game', $this->getLastGames());
+        return view('index');
+    }
+
+    public function games(GameRepository $gameRepository)
+    {
+        return GameResource::collection($gameRepository->getLastGames());
+    }
+
+    public function layout()
+    {
+        return view('layouts.game_layout');
     }
 
     public function getMainLayout()
@@ -37,58 +48,9 @@ class GameController extends Controller
         return $data;
     }
 
-    public function getNewTableLayout()
+    public function getNewTableLayout(GameRepository $gameRepository): View
     {
-        $params = $this->getLastGames();
-        return view('game.new_table', $params);
-    }
-
-    private function getLastGames(): array
-    {
-        $games = Game::limit(10)->orderBy('id', 'DESC')->get();
-        if (! $games) {
-            return ['games' => []];
-        }
-
-        $usersId = [];
-        foreach ($games as $game) {
-            array_push($usersId, $game->gamerOne, $game->gamerTwo);
-        }
-        $users = $this->getUsers($usersId);
-
-        $rounds = $this->getGameRounds($games->modelKeys());
-        $gameRounds = [];
-        foreach ($rounds as $gameRound) {
-            $gameRounds[$gameRound->gameId][] = $gameRound->toArray();
-        }
-
-        foreach ($games as $game) {
-            $rounds = $gameRounds[$game->id];
-            $account = GoalCount::getAccountOfGame($rounds);
-
-            $game->gamerOneAccount = $account[$game->gamerOne] ?? 0;
-            $game->gamerTwoAccount = $account[$game->gamerTwo] ?? 0;
-            $game->gamerOneName = $users[$game->gamerOne]['login'];
-            $game->gamerTwoName = $users[$game->gamerTwo]['login'];
-            $game->totalTimeFormat = gmdate('H:i:s', $game->totalTime);
-            $game->date = $this->formatDate($game->dateTime);
-        }
-        return ['games' => $games];
-    }
-
-    private function setKeys($users, string $key)
-    {
-        $result = [];
-        foreach ($users as $item) {
-            $result[$item[$key]] = $item;
-        }
-        return $result;
-    }
-
-    private function getUsers(array $userID)
-    {
-        $users = User::whereIn('id', $userID)->get()->toArray();
-        return $this->setKeys($users, 'id');
+        return view('game.new_table', ['games' => $gameRepository->getLastGames()]);
     }
 
     private function countRounds(array $data)
@@ -142,12 +104,15 @@ class GameController extends Controller
         return $result;
     }
 
-    private function getGameRounds(array $modelKeys)
+    public function store(GameRequest $request, GameRepository $gameRepository): Response
     {
-        return GameRound::leftJoin('rounds', 'game_rounds.roundId', '=', 'rounds.id')
-            ->select(['rounds.*', 'game_rounds.gameId'])
-            ->whereIn('game_rounds.gameId', $modelKeys)
-            ->get();
+        $validated = $request->validated();
+
+        $gameRepository->store($validated);
+
+        TableOccupation::truncate();
+
+        return response(status: 201);
     }
 
     private function formatDate(string $dateTime): string

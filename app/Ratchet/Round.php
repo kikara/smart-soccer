@@ -2,73 +2,82 @@
 
 namespace App\Ratchet;
 
+use App\Models\GameSettingTemplate;
+use Illuminate\Support\Collection;
+
 class Round
 {
     public const MAX_COUNT = 10;
-
-    private int $blueCount = 0;
-    private int $redCount = 0;
-
-    private int $blueGamerID = 0;
-    private int $redGamerID = 0;
-
-    private int $winnerID = 0;
-
-    private bool $roundEnd = false;
+    public const TIME_DELAY = 1;
 
     public GoalTrack $goalTrack;
 
+    private int $winnerUserId = 0;
+
+    private bool $roundEnd = false;
+
+    /**
+     * @var Collection<string, RoundUserScore>
+     */
+    protected Collection $gamers;
     public function __construct()
     {
         $this->goalTrack = new GoalTrack();
+        $this->gamers = new Collection();
     }
 
-    public function setGamers($blue, $red): void
+    public function setGamers(array $gamers): void
     {
-        $this->blueGamerID = (int) $blue;
-        $this->redGamerID = (int) $red;
+        foreach ($gamers as $side => $userId) {
+            $roundUserScore = new RoundUserScore($userId, $side);
+            $this->gamers->put($side, $roundUserScore);
+        }
     }
 
-    public function getWinnerID(): int
+    public function score(string $side): void
     {
-        return $this->winnerID;
+        $userScore = $this->gamers->get($side);
+
+        if (! $this->available($userScore->scoreTime)) {
+            return;
+        }
+
+        $userMissed = $this->gamers->get(
+            GameSettingTemplate::oppositeSide($side)
+        );
+
+        $userScore->increment();
+
+        $this->goalTrack->put(
+            $userScore->toArray(),
+            $userMissed->toArray()
+        );
+
+        $this->roundEnd = $userScore->score >= self::MAX_COUNT;
+
+        if ($this->roundEnd) {
+            $this->winnerUserId = $userScore->userId;
+        }
     }
 
-    public function getBlueGamerID(): int
+    public function getWinnerUserId(): int
     {
-        return $this->blueGamerID;
-    }
-
-    public function getRedGamerID(): int
-    {
-        return $this->redGamerID;
-    }
-
-    public function incrementBlue(): void
-    {
-        $this->increment('blue');
-    }
-
-    public function incrementRed(): void
-    {
-        $this->increment();
+        return $this->winnerUserId;
     }
 
     public function reset(): void
     {
-        $this->blueCount = 0;
-        $this->redCount = 0;
         $this->goalTrack = new GoalTrack();
+        foreach ($this->gamers as $gamer) {
+            $gamer->score = 0;
+        }
     }
 
     public function getState(): array
     {
         return [
-            'blue_gamer_id' => $this->blueGamerID,
-            'red_gamer_id' => $this->redGamerID,
-            'blue_count' => $this->blueCount,
-            'red_count' => $this->redCount,
-            'winner_id' => $this->winnerID,
+            'gamers' => $this->getGamers(),
+            'winner_id' => $this->winnerUserId,
         ];
     }
 
@@ -79,45 +88,27 @@ class Round
 
     public function deleteLastGoal(): void
     {
-        $lastScoredGamer = $this->goalTrack->getGoalScoredUserId();
+        $lastScoredSide = $this->goalTrack->getLastScoredSide();
 
-        $count = $lastScoredGamer === $this->redGamerID ? 'redCount' : 'blueCount';
+        $userScore = $this->gamers->get($lastScoredSide);
 
-        if ($this->$count > 0) {
-            $this->$count--;
+        if ($userScore) {
+            $userScore->decrement();
+            $this->goalTrack->deleteLastGoal();
         }
-
-        $this->goalTrack->deleteLastGoal();
     }
 
-    private function increment(string $value = 'red'): void
+    public function getGamers(): array
     {
-        [$scored, $missed] = $this->getItems($value);
-
-        $this->goalTrack->updateScore($this->{$scored['gamer']}, $this->{$missed['gamer']});
-        if ($this->{$scored['count']} < self::MAX_COUNT) {
-            $this->{$scored['count']}++;
+        $out = [];
+        foreach ($this->gamers as $gamer) {
+            $out[$gamer->side] = $gamer->toArray();
         }
-        if ($this->{$scored['count']} === self::MAX_COUNT) {
-            $this->winnerID = $this->{$scored['gamer']};
-            $this->roundEnd = true;
-        }
-        $this->goalTrack->setScoredCount($this->{$scored['count']});
-        $this->goalTrack->setMissedCount($this->{$missed['count']});
+        return $out;
     }
 
-    private function getItems(string $value): array
+    private function available(int $scoreTime): bool
     {
-        $items = [
-            [
-                'gamer' => 'redGamerID',
-                'count' => 'redCount',
-            ],
-            [
-                'gamer' => 'blueGamerID',
-                'count' => 'blueCount',
-            ]
-        ];
-        return $value === 'red' ? $items : array_reverse($items);
+        return time() - $scoreTime > self::TIME_DELAY;
     }
 }

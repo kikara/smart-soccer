@@ -1,23 +1,14 @@
 <?php
 
+use App\Http\Controllers\Debug\DebugController;
+use App\Http\Controllers\Game\GameController;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
-
-Route::get('/', function () {
-    return redirect()->route('game');
-});
-
 Auth::routes();
+
+Route::get('/', [GameController::class, 'index'])->name('index');
+Route::get('/games', [GameController::class, 'games']);
+
 
 Route::group(['namespace' => 'UserProfile'], function () {
     Route::prefix('/profile')->group(function () {
@@ -31,8 +22,8 @@ Route::group(['namespace' => 'UserProfile'], function () {
     Route::post('/saveProfile', 'UserProfileController@saveProfile');
 });
 
-Route::group(['namespace' => 'Game'], function() {
-    Route::get('/game', 'GameController@index')->name('game');
+Route::group(['prefix' => '/game'], function () {
+    Route::get('/layout', [GameController::class, 'layout']);
 });
 
 Route::group(['namespace' => 'Tournaments'], function() {
@@ -43,9 +34,9 @@ Route::group(['namespace' => 'Tournaments'], function() {
     });
 });
 
-Route::group(['namespace' => 'Debug'], function () {
-    Route::get('/debug', 'DebugController@index')->name('debug');
-});
+
+Route::get('/debug', [DebugController::class, 'index'])->name('debug');
+
 
 Route::group(['namespace' => 'Statistics'], function () {
     Route::get('/statistics', 'StatisticController@index')->name('statistics');

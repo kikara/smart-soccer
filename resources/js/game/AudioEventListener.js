@@ -1,13 +1,10 @@
 import GamerAudio from "./GamerAudio";
 
 export default function AudioEventListener () {
-    let This = this;
+    const This = this;
     this.usersAudio = {};
     const GOAL_EVENT = 'goal';
     const GAME_OVER = 'game_over';
-
-    this.init = function () {
-    }
 
     this.gamersAudioInit = function (json) {
         let gamers = [json['round']['blue_gamer_id'], json['round']['red_gamer_id']];

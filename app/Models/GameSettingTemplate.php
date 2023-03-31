@@ -20,6 +20,11 @@ class GameSettingTemplate extends Model
         return self::BLUE_SIDE === $side;
     }
 
+    public static function oppositeSide(string $side): string
+    {
+        return self::isBlueSide($side) ? self::RED_SIDE : self::BLUE_SIDE;
+    }
+
     /**
      * The attributes that are mass assignable.
      *

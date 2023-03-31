@@ -1,2 +1,27 @@
 @import "~bootstrap/scss/bootstrap";
-@import "~jquery-confirm/css/jquery-confirm.css";
+//@import "~jquery-confirm/css/jquery-confirm.css";
+//@import "vuetify/dist/vuetify";
+
+
+/**
+    Versus Component
+ */
+@import "versus";
+
+.media-center-row {
+    display: flex;
+    justify-content: space-around;
+}
+
+@include media-breakpoint-up(lg) {
+    .media-center-row {
+        width: 100%;
+    }
+}
+
+@include media-breakpoint-between(xs, lg) {
+    .media-center-row {
+        min-height: 100vh;
+        flex-direction: column;
+    }
+}

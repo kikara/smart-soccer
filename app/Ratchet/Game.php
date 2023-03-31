@@ -6,10 +6,7 @@ use App\Models\GameSettingTemplate;
 
 class Game
 {
-    public const TIME_DELAY = 10;
     public const GAME_WIN_COUNT = 2;
-    public int $lastAccountedGoalBlue;
-    public int $lastAccountedGoalRed;
 
     private \DateTime $dateTime;
     private int $startGameTime = 0;
@@ -23,9 +20,9 @@ class Game
     private bool $isGameStarted = false;
     private bool $isGameOver = false;
 
-    private int $winnerID = 0;
+    private int $winnerUserId = 0;
 
-    private int $tableOccupationID = 0;
+    private int $tableOccupationId = 0;
 
     private array $states = [];
 
@@ -35,22 +32,19 @@ class Game
     private array $rounds = [];
     private int $currentRound = 0;
 
+    protected GameEvents $gameEvents;
+
     public function __construct()
     {
-        $this->lastAccountedGoalBlue = time();
-        $this->lastAccountedGoalRed = time();
-        $this->addRound(new Round());
+        $this->rounds[] = new Round();
         $this->dateTime = new \DateTime();
-    }
-
-    public function incrementIndexRound(): void
-    {
-        $this->currentRound++;
+        $this->gameEvents = new GameEvents($this);
     }
 
     public function addRound(Round $round): void
     {
         $this->rounds[] = $round;
+        $this->currentRound++;
     }
 
     public function getCurrentRound(): Round
@@ -68,14 +62,11 @@ class Game
         return $this->isSideChange;
     }
 
-    public function incrementBlueTeam(): void
+    public function score(string $side): void
     {
-        $this->getCurrentRound()->incrementBlue();
-    }
-
-    public function incrementRedTeam(): void
-    {
-        $this->getCurrentRound()->incrementRed();
+        if (! $this->isRoundEnd()) {
+            $this->getCurrentRound()->score($side);
+        }
     }
 
     public function startGame(): void
@@ -105,7 +96,7 @@ class Game
             'current_round' => $this->currentRound,
             'is_side_change' => $this->isSideChange,
             'game_over' => $this->isGameOver,
-            'game_winner_id' => $this->winnerID,
+            'game_winner_id' => $this->winnerUserId,
             'dateTime' => $this->dateTime->format('U'),
             'round' => $this->getRoundState(),
             'events' => $this->getEvents(),
@@ -114,7 +105,7 @@ class Game
         if ($this->isGameOver) {
             $res['total_time'] = $this->getTotalTime();
             $res['template_id'] = $this->gameSettingTemplateID;
-            $res['table_occupation_id'] = $this->tableOccupationID;
+            $res['table_occupation_id'] = $this->tableOccupationId;
         }
         foreach ($this->states as $key => $state) {
             $res[$key] = $state;
@@ -123,14 +114,16 @@ class Game
         return $res;
     }
 
-    public function setGameMode(string $mode): void
+    public function setGameMode(string $mode): static
     {
         $this->mode = $mode;
+        return $this;
     }
 
-    public function setSideChange(): void
+    public function setSideChange(bool $isChange): static
     {
-        $this->isSideChange = true;
+        $this->isSideChange = $isChange;
+        return $this;
     }
 
     public function reset(): void
@@ -160,33 +153,28 @@ class Game
 
     public function checkForGameOver(): void
     {
-        if (count($this->rounds) >= self::GAME_WIN_COUNT) {
-            $gamersCountRound['blue'] = 0;
-            $gamersCountRound['red'] = 0;
-            $blueGamer = $this->getCurrentRound()->getBlueGamerID();
-            foreach ($this->rounds as $round) {
-                if ($blueGamer === $round->getWinnerID()) {
-                    ++$gamersCountRound['blue'];
-                } else {
-                    ++$gamersCountRound['red'];
-                }
-                if ($gamersCountRound['blue'] === self::GAME_WIN_COUNT) {
-                    $this->winnerID = $blueGamer;
-                    $this->gameOver();
-                    return;
-                }
-                if ($gamersCountRound['red'] === self::GAME_WIN_COUNT) {
-                    $this->winnerID = $this->getCurrentRound()->getRedGamerID();
-                    $this->gameOver();
-                    return;
-                }
-            }
+        if (count($this->rounds) < self::GAME_WIN_COUNT) {
+            return;
+        }
+
+        $frequency = array_count_values(array_map(fn($item) => $item->getWinnerUserId(), $this->rounds));
+
+        arsort($frequency);
+
+        $winnerUserId = array_key_first($frequency);
+
+        $count = $frequency[$winnerUserId];
+
+        if ($winnerUserId && $count === self::GAME_WIN_COUNT) {
+            $this->winnerUserId = $winnerUserId;
+            $this->gameOver();
         }
     }
 
-    public function setGameSettingTemplate($templateID): void
+    public function setGameSettingTemplate($id): static
     {
-        $this->gameSettingTemplateID = (int) $templateID;
+        $this->gameSettingTemplateID = (int) $id;
+        return $this;
     }
 
     public function isGameOver(): bool
@@ -216,37 +204,47 @@ class Game
 
     private function getEvents(): array
     {
-        return GameEvents::getGameEvents($this);
+        return $this->gameEvents->getEvents();
     }
 
-    public function setTableOccupationID($id): void
+    public function setTableOccupationId($id): void
     {
-        $this->tableOccupationID = (int) $id;
-    }
-
-    public function getTableOccupationID($id): int
-    {
-        return $this->tableOccupationID;
-    }
-
-    public function isTimeCheck(string $side): bool
-    {
-        $now = time();
-        $lastTime = GameSettingTemplate::isBlueSide($side) ? $this->lastAccountedGoalBlue : $this->lastAccountedGoalRed;
-        $diff = $now - $lastTime;
-        if ($diff > self::TIME_DELAY) {
-            if (GameSettingTemplate::isBlueSide($side)) {
-                $this->lastAccountedGoalBlue = $now;
-            } else {
-                $this->lastAccountedGoalRed = $now;
-            }
-            return true;
-        }
-        return false;
+        $this->tableOccupationId = (int) $id;
     }
 
     public function resetLastGoal(): void
     {
         $this->getCurrentRound()->deleteLastGoal();
+    }
+
+    public function setNewGameRound(): void
+    {
+        if ($this->isGameOver()) {
+            return;
+        }
+
+        $currentRound = $this->getCurrentRound();
+
+        $gamers = $currentRound->getGamers();
+
+        $temp = [];
+        foreach ($gamers as $side => $gamer) {
+            $temp[$side] = $gamer['user_id'];
+        }
+
+        $round = new Round();
+
+        if ($this->isSideChange()) {
+            $first = array_key_first($temp);
+            $last = array_key_last($temp);
+            $temp = [
+                $first => $temp[$last],
+                $last => $temp[$first]
+            ];
+        }
+
+        $round->setGamers($temp);
+
+        $this->addRound($round);
     }
 }
