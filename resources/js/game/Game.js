@@ -6,11 +6,9 @@ export default function Game() {
         eventListener: null,
         audioEventListener: null,
         startTime: 0,
-        contentLoaded: false,
+        conn: null,
 
         init() {
-            this.$container = $('#container');
-
             this.eventListener = new EventListener();
             this.eventListener.addListener(this.event);
 
@@ -52,9 +50,6 @@ export default function Game() {
         },
 
         tableOccupiedAction(data) {
-            $.get('/games/layout', data, (response) => {
-                this.$container.html(response.content);
-            });
         },
     }
 };

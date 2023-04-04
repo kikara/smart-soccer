@@ -71,9 +71,6 @@ export default {
             authenticated: Boolean(this.isAuth)
         }
     },
-    created() {
-        console.log(this.authenticated);
-    },
 }
 </script>
 

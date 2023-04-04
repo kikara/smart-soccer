@@ -10,6 +10,7 @@ RUN apt-get update \
              libicu-dev \
              libfreetype6-dev \
              procps \
+             supervisor \
     && pecl install xdebug \
     && docker-php-ext-install \
         mysqli pdo_mysql \

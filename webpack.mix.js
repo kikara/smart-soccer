@@ -8,6 +8,9 @@ const mix = require('laravel-mix');
 
 // mix
 
+// mix.js('resources/js/main', 'public/js')
+//     .js('resources/js/debug_index', 'public/js');
+
 mix.js('resources/js/app', 'public/js')
     .vue();
     // .sass('resources/css/app.scss', 'public/css')

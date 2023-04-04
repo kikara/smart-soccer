@@ -6,7 +6,6 @@
 
 @section('content')
     <div id="debug-container" class="container">
-
         <div class="row">
             <div class="col-sm-8 p-2">
                 <div class="d-flex flex-column gap-1">
@@ -73,6 +72,7 @@
     </div>
 @endsection
 
-@section('scripts')
+@section('head')
+    <script src="{{ asset('js/main.js') }}"></script>
     <script src="{{ asset('js/debug_index.js') }}"></script>
 @endsection

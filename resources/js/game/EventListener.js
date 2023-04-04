@@ -1,4 +1,7 @@
 export default function EventListener() {
+
+    const callbacks = [];
+
     return {
         currentState: null,
 
@@ -6,7 +9,9 @@ export default function EventListener() {
 
         subscribers: {},
 
-        callbacks: [],
+        addListener(callback) {
+            callbacks.push(callback);
+        },
 
         handle(data) {
             this.currentState = data;
@@ -29,13 +34,13 @@ export default function EventListener() {
 
         onTableOccupied() {
             if (this.currentState['is_busy'] && this.stateChanged('is_busy')) {
-                this.notify('tableOccupied');
+                this.notify('booked');
             }
         },
 
         gameStarted() {
             if (this.currentState['game_started'] && this.stateChanged('game_started')) {
-                this.notify('gameStarted');
+                this.notify('started');
             }
         },
 
@@ -72,34 +77,19 @@ export default function EventListener() {
                 && this.currentState['game_started']
                 && this.stateChanged('current_round')
             ) {
-                this.notify('newRound');
+                this.notify('new_round');
             }
         },
 
         onGameOver() {
             if (this.currentState['game_over']) {
-                this.notify('gameOver');
+                this.notify('game_over');
                 this.previousState = null;
             }
         },
 
-        addEventListener(event, callback) {
-            const callbacks = this.subscribers[event] ?? [];
-            callbacks.push(callback);
-            this.subscribers[event] = callbacks;
-        },
-
-        addListener(callback) {
-            this.callbacks.push(callback);
-        },
-
         notify(event) {
-            const callbacks = this.subscribers[event] ?? [];
-            for (const callback of callbacks) {
-                callback(this.currentState);
-            }
-
-            for (const item of this.callbacks) {
+            for (const item of callbacks) {
                 item(event, this.currentState);
             }
         }

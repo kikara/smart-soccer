@@ -2,12 +2,14 @@
 
 use App\Http\Controllers\Debug\DebugController;
 use App\Http\Controllers\Game\GameController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Auth::routes();
 
 Route::get('/', [GameController::class, 'index'])->name('index');
 Route::get('/games', [GameController::class, 'games']);
+Route::get('/users/{user}', [UserController::class, 'show'])->whereNumber('user');
 
 
 Route::group(['namespace' => 'UserProfile'], function () {
