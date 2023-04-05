@@ -1,10 +1,10 @@
 <template>
-    <div :class="{ 'd-none': events.gameMode }">
-        <navigation-component :is-auth="isAuth"></navigation-component>
-        <last-games-component></last-games-component>
+    <div>
+        <navigation-component v-if="!events.gameMode" :is-auth="isAuth"></navigation-component>
+        <last-games-component v-if="!events.gameMode"></last-games-component>
+        <versus-component v-if="events.versus" :start="events.start" :gamers="gamers"></versus-component>
+<!--        <game-component v-if="events.gameMode" :gamers="gamers"></game-component>-->
     </div>
-    <versus-component v-if="events.gameMode" :start-status="events.startStatus" :gamers="gamers"></versus-component>
-    <game-component v-if="events.gameMode" :gamers="gamers"></game-component>
 </template>
 
 <script>
@@ -23,9 +23,23 @@ export default {
             counter: 0,
             events: {
                 gameMode: false,
-                startStatus: false
+                versus: false,
+                start: false,
             },
-            gamers: [],
+            gamers: [
+                {
+                    id: 1,
+                    name: 'user',
+                    avatar: '/images/user/man.png',
+                    score: 1
+                },
+                {
+                    id: 1,
+                    name: 'user',
+                    avatar: '/images/user/man.png',
+                    score: 1
+                }
+            ],
             eventListener: EventListener()
         }
     },
