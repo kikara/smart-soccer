@@ -1,5 +1,5 @@
 <template>
-    <div :class="{'un-visible': visible}">
+    <div>
         <img class="background" alt="back" src="/images/game/soccer_back.png"/>
         <!--  ScoreBoard  -->
         <div
@@ -13,41 +13,32 @@
         </div>
         <!--  Progress line  -->
         <div class="w-100 position-absolute start-0 top-0 p-4 z-index-5">
-            <div class="row gap-1">
-                <div class="col">
-                    <div class="d-flex">
-                        <img src="/images/user/man.png" alt="" width="150">
-                        <div class="w-100" style="padding-top: 2.5rem">
+            <div class="row gap-1 position-relative">
+                <div class="col" v-for="(gamer, index) in gamers" :key="gamer.id">
+                    <div class="d-flex" :class="{'flex-row-reverse': index === 1}">
+                        <img :src="gamer.avatar" alt="" width="150">
+                        <div class="w-100 pt-3">
                             <v-progress-linear
                                 color="red"
                                 height="30"
-                                reverse="reverse"
-                                v-model="gamers[0].progress"
+                                v-model="gamer.progress"
+                                :reverse="index === 0"
                             ></v-progress-linear>
-                            <div class="user-login">{{ gamers[0].name }}</div>
+                            <div class="d-flex justify-content-between"
+                                 :class="{'flex-row-reverse': index === 1}"
+                            >
+                                <div class="user-login">{{ gamer.name }}</div>
+                                <div>
+                                    <img class="mt-1" v-for="round in gamer.rounds" src="/images/game/soccerball.svg" alt="soccer" width="30">
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-auto position-relative">
-                    <div
-                        class="position-absolute top-0 d-flex justify-items-center justify-content-center rounded-2 time-count-container">
-                        <div>
-                            {{ time }}
-                        </div>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="d-flex">
-                        <div class="w-100" style="padding-top: 2.5rem;">
-                            <v-progress-linear
-                                color="red"
-                                height="30"
-                                v-model="gamers[1].progress"
-                            ></v-progress-linear>
-                            <div class="text-end user-login">{{ gamers[1].name }}</div>
-                        </div>
-                        <img src="/images/user/man.png" alt="" width="150">
-                    </div>
+
+                <div
+                    class="position-absolute top-0 d-flex justify-items-center justify-content-center rounded-5 time-count-container">
+                        {{ time }}
                 </div>
             </div>
         </div>
@@ -65,7 +56,34 @@
 <script>
 export default {
     name: "GameComponent",
-    props: ['gamers'],
+    props: {
+        gamers: {
+            type: Array,
+            required: true,
+            default() {
+                const defaultGamer = {
+                    id: 0,
+                    name: '',
+                    avatar: '/images/user/man.png',
+                    score: 0,
+                    progress: 100,
+                }
+
+                const out = [];
+                for (let i = 0; i < 2; i++) {
+                    out.push(defaultGamer);
+                }
+
+                return out;
+            }
+        },
+        start: {
+            type: Boolean
+        },
+        startTime: {
+            type: Number
+        }
+    },
     data() {
         return {
             seconds: 0,
@@ -74,7 +92,9 @@ export default {
         }
     },
     methods: {
-        start() {
+        startTimer() {
+            const now = Math.floor(new Date().valueOf() / 1000);
+            this.seconds = now - this.startTime;
             this.interval = setInterval(this.timer, 1000);
         },
         timer() {
@@ -89,8 +109,17 @@ export default {
             clearInterval(this.interval);
         },
     },
+    watch: {
+        start(val) {
+            if (val) {
+                this.startTimer();
+            }
+        },
+    },
     mounted() {
-        setTimeout(() => this.visible = false, 500);
+        if (this.start) {
+            this.startTimer();
+        }
     }
 }
 
@@ -119,7 +148,7 @@ export default {
 }
 
 .time-count-container {
-    left: -60px;
+    left: calc(50% - 75px);
     width: 150px;
     background: white;
     z-index: 10;
@@ -135,9 +164,5 @@ export default {
 
 .w-min-content {
     width: min-content;
-}
-
-.un-visible {
-    visibility: hidden;
 }
 </style>
