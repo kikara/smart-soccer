@@ -44,7 +44,7 @@ export default {
         }
     },
     created() {
-        axios.get('/games')
+        axios.get('/api/games')
             .then((response) => {
                 this.games = response.data.data;
 

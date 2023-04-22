@@ -46,8 +46,8 @@
         <div
             class="position-absolute w-100 start-0 top-0 d-flex justify-content-center align-items-center flex-column min-vh-100">
             <div class="d-flex flex-column gap-5 z-index-5 w-min-content">
-                <v-btn block rounded="lg" size="x-large">Отмена последнего гола</v-btn>
-                <v-btn block rounded="lg" size="x-large">Завершить игру</v-btn>
+                <v-btn block rounded="lg" size="x-large" @click="this.$emit('reset-last')">Отмена последнего гола</v-btn>
+                <v-btn block rounded="lg" size="x-large" @click="this.$emit('end-game')">Завершить игру</v-btn>
             </div>
         </div>
     </div>
@@ -107,7 +107,7 @@ export default {
         },
         stop() {
             clearInterval(this.interval);
-        },
+        }
     },
     watch: {
         start(val) {

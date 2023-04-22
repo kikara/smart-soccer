@@ -1,13 +1,27 @@
 <template>
     <div>
-        <navigation-component v-if="!events.gameMode" :is-auth="isAuth"></navigation-component>
-        <last-games-component v-if="!events.gameMode"></last-games-component>
-        <versus-component v-if="events.versus" :start="events.start" :gamers="gamers"></versus-component>
+        <navigation-component
+            v-if="!events.gameMode"
+        ></navigation-component>
+
+        <last-games-component
+            v-if="!events.gameMode"
+        ></last-games-component>
+
+        <versus-component
+            v-if="events.versus"
+            :start="events.start"
+            :gamers="gamers"
+            @game-start="startGame"
+        ></versus-component>
+
         <game-component
             v-if="events.gameMode"
             :gamers="gamers"
             :start="events.start"
             :start-time="events.startTime"
+            @reset-last="resetLastGoal"
+            @end-game="endGame"
         ></game-component>
     </div>
 </template>
@@ -16,12 +30,11 @@ import NavigationComponent from "./NavigationComponent.vue";
 import LastGamesComponent from "./LastGamesComponent.vue";
 import VersusComponent from "./VersusComponent.vue";
 import GameComponent from "./GameComponent.vue";
-import GameSocket from "../game/socket";
-import EventListener from "../game/EventListener";
+import GameSocket from "../../game/socket";
+import EventListener from "../../game/EventListener";
 
 export default {
     name: "GameIndex",
-    props: ['isAuth'],
     data() {
         return {
             counter: 0,
@@ -32,7 +45,14 @@ export default {
                 startTime: 0,
             },
             gamers: [],
-            eventListener: EventListener()
+            eventListener: EventListener(),
+            eventCallbacks: {
+                booked: this.booked,
+                started: this.started,
+                goal: this.goal,
+                new_round: this.newRound,
+                game_over: this.gameOver,
+            }
         }
     },
     methods: {
@@ -42,23 +62,20 @@ export default {
         },
         eventHandle(event, state) {
             console.log(event);
-            const callbacks = {
-                booked: this.booked,
-                started: this.started,
-                goal: this.goal,
-                new_round: this.newRound,
-                game_over: this.gameOver,
-            };
-            callbacks[event](state);
+            this.eventCallbacks[event](state);
         },
         async booked(state) {
+            console.log('fist log');
             await this.setGamers(state);
+            console.log('end log');
             this.events.versus = true;
-            setTimeout(() => this.events.gameMode = true, 450);
+            setTimeout(() => {
+                this.events.gameMode = true;
+            }, 500);
         },
         async setGamers(state) {
             for (const item of Object.values(state.round.gamers)) {
-                axios.get('/users/' + item.user_id).then((response) => {
+                axios.get('/api/users/' + item.user_id).then((response) => {
                     const data = response.data.data;
                     this.gamers.push({
                         id: data.id,
@@ -68,13 +85,17 @@ export default {
                         progress: 100,
                         rounds: 0
                     });
+                    console.log('response log');
                 });
+                console.log('for log');
             }
         },
         started(state) {
             this.events.start = true;
             this.events.startTime = state.start_time;
-            setTimeout(() => this.versus = false, 450);
+            setTimeout(() => {
+                this.events.versus = false;
+            }, 500);
         },
         goal(state) {
             for (const gamer of this.gamers) {
@@ -95,16 +116,26 @@ export default {
             }
         },
         gameOver(state) {
+            this.events.versus = false;
             this.events.gameMode = false;
             this.events.start = false;
         },
         progress(value) {
             return (10 - value) * 10;
         },
+        startGame() {
+            this.socket.send({cmd: 'start'});
+        },
+        resetLastGoal() {
+            this.socket.send({cmd: 'resetLastGoal'});
+        },
+        endGame() {
+            console.log('end game');
+        },
     },
     mounted() {
-        const socket = GameSocket();
-        socket.addEventListener(this.handle)
+        this.socket = GameSocket();
+        this.socket.addEventListener(this.handle)
         this.eventListener.addListener(this.eventHandle);
     },
     components: {
