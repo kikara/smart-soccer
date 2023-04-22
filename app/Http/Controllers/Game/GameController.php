@@ -12,6 +12,7 @@ use App\Models\UserSingleAudio;
 use App\Resources\GameRepository;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Response;
 
 class GameController extends Controller
@@ -21,7 +22,7 @@ class GameController extends Controller
         return view('index');
     }
 
-    public function games(GameRepository $gameRepository)
+    public function games(GameRepository $gameRepository): JsonResource
     {
         return GameResource::collection($gameRepository->getLastGames());
     }
@@ -67,6 +68,11 @@ class GameController extends Controller
         return $result;
     }
 
+    /**
+     * @deprecated
+     * @param Request $request
+     * @return array
+     */
     public function getGamersAudio(Request $request)
     {
         $data = $request->all();
@@ -106,6 +112,10 @@ class GameController extends Controller
 
     public function store(GameRequest $request, GameRepository $gameRepository): Response
     {
+        /**
+         * TODO delete
+         */
+        return response(201);
         $validated = $request->validated();
 
         $gameRepository->store($validated);

@@ -9,71 +9,86 @@ use GuzzleHttp\Exception\GuzzleException;
 class GameMessageHandler
 {
     private HttpClient $client;
+    protected Game $game;
+    protected MessageRegistry $messageRegistry;
 
     public function __construct()
     {
         $this->client = new HttpClient();
+        $this->game = new Game();
+        $this->messageRegistry = MessageRegistry::getInstance();
     }
 
-    public function handleMessage(Game $game, array $data): void
+    public function handleMessage(array $data): void
     {
         $action = $data['cmd'] . 'Action';
 
         if (method_exists($this, $action)) {
-            $this->$action($game, $data);
+            $this->$action($data);
+        }
+
+        $this->messageRegistry->setPayload($this->game->getState());
+
+        if ($this->game->isGameOver()) {
+            $this->game = new Game();
         }
     }
 
-    private function countAction(Game $game, array $data): void
+    private function countAction(array $data): void
     {
         if (! in_array($data['value'], ['red', 'blue'], true)) {
             return;
         }
 
-        if ($game->isGameStarted() && $game->isGameNotOver()) {
+        if ($this->game->isGameStarted() && $this->game->isGameNotOver()) {
 
-            $game->score($data['value']);
+            $this->game->score($data['value']);
 
-            if ($game->isRoundEnd()) {
+            if ($this->game->isRoundEnd()) {
 
-                $game->checkForGameOver();
+                $this->game->checkForGameOver();
 
-                $game->setNewGameRound();
+                $this->game->setNewGameRound();
             }
         }
 
-        if ($game->isGameOver()) {
-            $this->client->sendToSaveGame($game->getState());
+        if ($this->game->isGameOver()) {
+            $this->client->sendToSaveGame($this->game->getState());
         }
     }
 
-    private function resetAction(Game $game): void
+    private function resetAction(): void
     {
-        if ($game->isGameStarted()) {
-            $game->reset();
+        if ($this->game->isGameStarted()) {
+            $this->game->reset();
         }
     }
 
-    private function resetLastGoalAction(Game $game): void
+    private function resetLastGoalAction(): void
     {
-        if ($game->isGameStarted()) {
-            $game->resetLastGoal();
+        if ($this->game->isGameStarted()) {
+            $this->game->resetLastGoal();
         }
     }
 
-    private function startAction(Game $game): void
+    private function startAction(): void
     {
-        if ($game->isBusy()) {
-            $game->startGame();
+        if ($this->game->isBusy()) {
+            $this->game->startGame();
         }
+    }
+
+    private function gameOverAction()
+    {
+        $this->game->gameOver();
     }
 
     /**
      * @throws GuzzleException|\JsonException
      */
-    private function prepareAction(Game $game, array $data): void
+    private function prepareAction(array $data): void
     {
-        if ($game->isGameStarted() || $game->isBusy()) {
+        if ($this->game->isGameStarted() || $this->game->isBusy()) {
             return;
         }
 
@@ -86,18 +101,18 @@ class GameMessageHandler
 
         $toSide = GameSettingTemplate::oppositeSide($templateRow['side']);
 
-        $round = $game->getCurrentRound();
+        $round = $this->game->getCurrentRound();
 
         $round->setGamers([
             $templateRow['side'] => $fromUserID,
             $toSide => $recipientUserID,
         ]);
 
-        $game->setSideChange((bool) $templateRow['side_change'])
+        $this->game->setSideChange((bool) $templateRow['side_change'])
             ->setGameSettingTemplate($data['t_id'])
             ->setGameMode($templateRow['mode'])
             ->setBusy();
 
-        $this->client->setOccupation($game, $fromUserID);
+        $this->client->setOccupation($this->game, $fromUserID);
     }
 }

@@ -16,8 +16,9 @@ class GamerResource extends JsonResource
     public function toArray($request)
     {
         return [
+            'id' => $this->id,
             'login' => $this->login,
-            'avatar_path' => $this->avatar_path,
+            'avatar_path' => ! empty($this->avatar_path) ?: '/images/user/man.png',
         ];
     }
 }

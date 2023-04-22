@@ -7,7 +7,9 @@ use App\Models\Game;
 use App\Models\GameUser;
 use App\Models\Round;
 use App\Models\RoundScore;
+use App\Models\User;
 use App\Models\UserRating;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 
 class GameRepository
@@ -89,5 +91,22 @@ class GameRepository
                 ['rating' => $points[$key]]
             );
         }
+    }
+
+    public function getUserLastGames(User $user)
+    {
+        /**
+         * @var Collection $gameUser
+         */
+        $gameUsers = GameUser::where('user_id', $user->id)->get();
+        $gameIds = $gameUsers->map(function ($gameUser) {
+            return $gameUser->game_id;
+        });
+
+        return Game::whereIn('id', $gameIds)
+            ->orderByDesc('id')
+            ->with(['users', 'rounds'])
+            ->limit(3)
+            ->get();
     }
 }
