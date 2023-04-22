@@ -1,12 +1,5 @@
-@import "~bootstrap/scss/bootstrap";
-//@import "~jquery-confirm/css/jquery-confirm.css";
-@import "vuetify/dist/vuetify";
-
-
-/**
-    Versus Component
- */
-@import "versus";
+@import "bootstrap/scss/bootstrap";
+@import "colors.css";
 
 .media-center-row {
     display: flex;
