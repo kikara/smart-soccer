@@ -20,7 +20,7 @@ class HttpClient
     public function sendToSaveGame(array $state): bool
     {
         $response = $this->client->post(
-            $this->query('/api/socket/game'),
+            $this->query('/api/games'),
             [
                 'form_params' => $state,
                 'headers' => ['Accept' => 'application/json']
