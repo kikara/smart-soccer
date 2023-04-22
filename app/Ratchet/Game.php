@@ -191,7 +191,7 @@ class Game
         return $result;
     }
 
-    private function gameOver(): void
+    public function gameOver(): void
     {
         $this->isGameOver = true;
         $this->endGameTime = time();
