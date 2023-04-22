@@ -14,5 +14,8 @@ export const userModule = {
         setAuthenticated(state) {
             state.is_auth = true;
         },
+        setUserId(state, id) {
+            state.user.id = id;
+        },
     }
 };
