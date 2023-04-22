@@ -100,6 +100,10 @@ export default function Debug() {
         resetLastGoal() {
             this.send({cmd: "resetLastGoal"});
         },
+
+        gameOver() {
+            this.send({cmd: 'gameOver'});
+        },
     }
 };
 
