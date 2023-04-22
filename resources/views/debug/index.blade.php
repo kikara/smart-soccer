@@ -27,12 +27,13 @@
                             </select>
                         </div>
                     @endfor
-                    <button class="btn btn-info" data-action="update">Обновить</button>
+                    <button class="btn btn-outline-primary" data-action="update">Обновить</button>
                     <button class="btn btn-outline-primary" data-action="prepareGame">Занять стол</button>
-                    <button class="btn btn-outline-info" data-action="start">Старт</button>
-                    <button class="btn btn-danger" data-action="count" data-side="red">Гол - красный</button>
-                    <button class="btn btn-primary" data-action="count" data-side="blue">Гол - синий</button>
-                    <button class="btn btn-success" data-action="resetLastGoal">Сброс последнего гола</button>
+                    <button class="btn btn-outline-primary" data-action="start">Старт</button>
+                    <button class="btn btn-outline-primary" data-action="count" data-side="red">Гол - красный</button>
+                    <button class="btn btn-outline-primary" data-action="count" data-side="blue">Гол - синий</button>
+                    <button class="btn btn-outline-primary" data-action="resetLastGoal">Сброс последнего гола</button>
+                    <button class="btn btn-outline-primary" data-action="gameOver">Отменить игру</button>
                 </div>
             </div>
         </div>
