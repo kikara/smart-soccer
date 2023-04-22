@@ -24,7 +24,7 @@ class UserResource extends JsonResource
         return [
             'id' => $this->id,
             'login' => $this->login,
-            'avatar' => ! empty($this->avatar_path) ? $this->avatar_path : '/images/user/man.png',
+            'avatar_path' => ! empty($this->avatar_path) ? '/storage/' . $this->avatar_path : '/images/user/man.png',
         ];
     }
 }

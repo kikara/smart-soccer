@@ -3,7 +3,9 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -12,6 +14,8 @@ use Laravel\Sanctum\HasApiTokens;
  * @property $id
  * @property $login
  * @property $avatar_path string|nullable
+ * @property Collection $audios
+ * @property Collection $eventAudios
  */
 class User extends Authenticatable
 {
@@ -49,4 +53,17 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    /**
+     * `user_single_audio`
+     */
+    public function audios(): HasMany
+    {
+        return $this->hasMany(UserSingleAudio::class);
+    }
+
+    public function eventAudios(): HasMany
+    {
+        return $this->hasMany(UserAudioEvent::class);
+    }
 }
