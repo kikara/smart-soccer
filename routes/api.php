@@ -5,21 +5,11 @@ use App\Http\Controllers\Game\GameController;
 use App\Http\Controllers\Game\TableOccupationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\UserSingleAudioController;
+use App\Http\Controllers\EventController;
+use App\Http\Controllers\UserEventAudioController;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| is assigned the "api" middleware group. Enjoy building your API!
-|
-*/
-
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
 
 Route::group(['namespace' => 'Popup'], function () {
     Route::prefix('/popup')->group(function () {
@@ -54,6 +44,16 @@ Route::group(['prefix' => '/bot'], function () {
     Route::post('/isTableOccupied', 'BotRequestController@isTableOccupied');
 });
 
-Route::group(['prefix' => '/socket'], function () {
-    Route::post('/game', [GameController::class, 'store']);
+
+Route::get('/games', [GameController::class, 'games']);
+Route::post('/games', [GameController::class, 'store']);
+
+Route::group(['prefix' => 'users'], function () {
+    Route::get('/{user}', [UserController::class, 'show'])->whereNumber(['user']);
+    Route::get('/{user}/games', [UserController::class, 'games'])->whereNumber(['user']);
+    Route::get('/{user}/audios', [UserSingleAudioController::class, 'index'])->whereNumber(['user']);
+    Route::get('/{user}/events/audios', [UserEventAudioController::class, 'index'])->whereNumber(['user']);
 });
+
+Route::get('/events', [EventController::class, 'index']);
+Route::get('/events/params', [EventController::class, 'params']);
