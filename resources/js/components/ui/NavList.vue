@@ -24,7 +24,7 @@ export default {
         return {
             navigations: [
                 {
-                    title: 'Профиль',
+                    title: 'Моя страница',
                     icon: 'mdi-home',
                     value: 'profile',
                     link: '/info/personal/' + this.$store.state.user.user.id
@@ -40,6 +40,24 @@ export default {
                     icon: 'mdi-view-dashboard',
                     value: 'stats',
                     link: '/info/personal/stats'
+                },
+                {
+                    title: 'Настройки профиля',
+                    icon: 'mdi-cog',
+                    value: 'settings',
+                    link: '/info/personal/settings'
+                },
+                {
+                    title: 'Звуки',
+                    icon: 'mdi-music-note',
+                    value: 'settings',
+                    link: '/info/sounds/without'
+                },
+                {
+                    title: 'Звуки на события',
+                    icon: 'mdi-music-note',
+                    value: 'settings',
+                    link: '/info/sounds/with'
                 }
             ],
         };
