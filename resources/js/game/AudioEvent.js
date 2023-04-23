@@ -18,6 +18,7 @@ export default function AudioEvent() {
 
         reset() {
             this.gamers = [];
+            this.readyState = false;
         },
 
         /**
@@ -45,7 +46,7 @@ export default function AudioEvent() {
                 started: 'gameStarted',
                 new_round: 'onNewRound',
                 goal: 'onGoal',
-                game_over: '',
+                game_over: 'onGameOver',
             };
 
             const callback = callbacks[event];
@@ -105,7 +106,7 @@ export default function AudioEvent() {
         },
 
         onGameOver(state) {
-
+            this.reset();
         },
 
         play(path) {
