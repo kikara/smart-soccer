@@ -43,7 +43,9 @@ class UserEventAudioController extends Controller
     }
     public function index(User $user): JsonResource
     {
-        return UserAudioEventResource::collection($user->eventAudios);
+        return UserAudioEventResource::collection($user->eventAudios->sortByDesc(function ($eventAudio) {
+            return count($eventAudio->parameters);
+        }));
     }
 
     public function destroy(UserAudioEvent $audio): Response

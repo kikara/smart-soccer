@@ -25,7 +25,12 @@
                 class="position-absolute d-flex top-0 start-0 w-100 justify-content-center align-items-center min-vh-100 z-index-100">
                 <div class="media-center-row">
                     <div class="d-flex flex-column align-items-center" v-for="gamer in gamers">
-                        <img :src="gamer.avatar" alt="avatar" width="150">
+                        <v-avatar
+                            :image="gamer.avatar"
+                            size="200"
+                        >
+
+                        </v-avatar>
                         <span class="user-login text-center">{{ gamer.name }}</span>
                     </div>
                 </div>

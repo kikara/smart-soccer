@@ -116,6 +116,7 @@ class GameController extends Controller
          * TODO delete
          */
         return response(201);
+
         $validated = $request->validated();
 
         $gameRepository->store($validated);
