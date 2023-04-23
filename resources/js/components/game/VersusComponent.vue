@@ -14,7 +14,15 @@
                  class="position-absolute top-0 start-0 w-100 d-flex align-items-center justify-content-center min-vh-100" style="z-index: 150">
                 <div style="max-width: 250px" class="d-flex flex-column gap-4">
                     <img src="/images/game/versus.png" width="150" class="align-self-center" alt=""/>
-                    <v-btn block rounded="lg" size="x-large" @click="this.$emit('game-start')">Старт</v-btn>
+                    <v-btn
+                        block
+                        size="x-large"
+                        @click="this.$emit('game-start')"
+                        elevation="0"
+                        style="background: transparent; font-size: 6rem;"
+                        class="font-primary"
+                    >Старт
+                    </v-btn>
                 </div>
             </div>
         </transition>
@@ -172,5 +180,10 @@ export default {
     font-weight: 400;
     font-size: 75px;
     color: #eeef46;
+}
+
+.font-primary {
+    font-family: 'Rubik Wet Paint', cursive;
+    color: lightyellow;
 }
 </style>

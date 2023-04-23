@@ -66,4 +66,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(UserAudioEvent::class);
     }
+
+    public function gameUsers(): HasMany
+    {
+        return $this->hasMany(GameUser::class);
+    }
+
+    public function ratings(): HasMany
+    {
+        return $this->hasMany(UserRating::class);
+    }
 }

@@ -20,7 +20,7 @@
                         <li class="nav-item" v-if="$store.state.user.is_auth">
                             <router-link :to="personalLink">
                                 <v-avatar
-                                    image="/images/user/man.png"
+                                    :image="$store.state.user.user.avatar_path"
                                     size="50"
                                 >
 

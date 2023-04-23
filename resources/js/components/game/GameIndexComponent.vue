@@ -152,6 +152,11 @@ export default {
         this.eventListener.addListener(this.eventHandle);
         this.audioEvent = new AudioEvent();
     },
+    beforeUnmount() {
+        this.socket = null;
+        this.eventListener = null;
+        this.audioEvent = null;
+    },
     components: {
         GameComponent,
         VersusComponent,
