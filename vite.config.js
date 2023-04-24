@@ -7,8 +7,7 @@ export default defineConfig({
     plugins: [
         laravel([
             'resources/css/app.scss',
-            'resources/js/app.js',
-            'resources/js/main.js',
+            'resources/js/app.js'
         ]),
         vue(),
         vuetify()

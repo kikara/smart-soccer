@@ -1,3 +1,6 @@
+require('bootstrap');
+require('./bootstrap');
+
 import {createApp} from "vue";
 import GameIndexComponent from "./components/game/GameIndexComponent.vue";
 
