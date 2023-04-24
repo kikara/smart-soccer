@@ -1,5 +1,5 @@
-import EventListener from "./game/EventListener";
-import {WS_HOST} from "./config";
+import EventListener from "../game/EventListener";
+import {WS_HOST} from "../config.js";
 export default function Debug() {
     return {
         eventListener: null,

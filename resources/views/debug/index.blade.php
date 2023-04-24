@@ -1,8 +1,9 @@
-@extends('layouts.app')
+@extends('layouts.app_debug')
 
 @php
     $users = \App\Models\User::where('telegram_chat_id', '!=', '')->get();
 @endphp
+
 
 @section('content')
     <div id="debug-container" class="container">
@@ -74,6 +75,5 @@
 @endsection
 
 @section('head')
-    <script src="{{ asset('js/main.js') }}"></script>
-    <script src="{{ asset('js/debug_index.js') }}"></script>
+    @vite(['resources/js/debug/debug_index.js'])
 @endsection
