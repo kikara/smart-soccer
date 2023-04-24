@@ -124,7 +124,7 @@ export default {
     height: 125px;
 }
 .banner {
-    background: url('/images/soccer_ball.jpg') repeat;
+    background: url('../../images/game/soccer_ball.jpg') repeat;
     background-size: cover;
 }
 

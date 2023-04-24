@@ -13,7 +13,7 @@
             <div v-if="infoState"
                  class="position-absolute top-0 start-0 w-100 d-flex align-items-center justify-content-center min-vh-100" style="z-index: 150">
                 <div style="max-width: 250px" class="d-flex flex-column gap-4">
-                    <img src="/images/game/versus.png" width="150" class="align-self-center" alt=""/>
+                    <img src="../../images/game/versus.png" width="150" class="align-self-center" alt=""/>
                     <v-btn
                         block
                         size="x-large"

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <img class="background" alt="back" src="/images/game/soccer_back.png"/>
+        <img class="background" alt="back" src="../../images/game/soccer_back.png"/>
         <!--  ScoreBoard  -->
         <div
             class="position-absolute d-flex top-0 start-0 w-100 justify-content-center align-items-center z-index-5 min-vh-100"
@@ -29,7 +29,7 @@
                             >
                                 <div class="user-login">{{ gamer.name }}</div>
                                 <div>
-                                    <img class="mt-1" v-for="round in gamer.rounds" src="/images/game/soccerball.svg" alt="soccer" width="30">
+                                    <img class="mt-1" v-for="round in gamer.rounds" src="../../images/game/soccerball.svg" alt="soccer" width="30">
                                 </div>
                             </div>
                         </div>

@@ -18,6 +18,10 @@ return new class extends Migration
         foreach ($gameRounds as $gameRound) {
             $round = \App\Models\Round::find($gameRound->roundId);
 
+            if (! $round) {
+                continue;
+            }
+
             $round->game_id  = $gameRound->gameId;
 
             $round->save();
