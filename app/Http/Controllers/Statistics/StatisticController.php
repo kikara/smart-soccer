@@ -40,8 +40,12 @@ class StatisticController extends Controller
                 }
             }
 
+            $user->rating = $user->ratings->isNotEmpty() ? $user->ratings->first()->rating : 0;
+
             return $user;
         });
+
+        $users = $users->sortByDesc('rating');
 
         return StatisticResource::collection($users);
     }

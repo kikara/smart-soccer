@@ -25,7 +25,7 @@ class StatisticResource extends JsonResource
             'win' => $this->win,
             'lose' => $this->lose,
             'count' => $this->gameCount,
-            'rating' => $this->ratings->isNotEmpty() ? $this->ratings->first()->rating : 0
+            'rating' => $this->rating,
         ];
     }
 }

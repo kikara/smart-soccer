@@ -1,6 +1,3 @@
-require('bootstrap');
-require('./bootstrap');
-
 import {createApp} from "vue";
 import GameIndexComponent from "./components/game/GameIndexComponent.vue";
 
@@ -36,5 +33,6 @@ const app = createApp({
     .use(store)
     .mount('#app');
 
+import './bootstrap';
 
 
