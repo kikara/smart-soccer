@@ -8,7 +8,7 @@ use JsonException;
 
 class HttpClient
 {
-    private const HOST = 'http://172.21.0.1';
+    private const HOST = 'http://localhost';
 
     protected Client $client;
 
