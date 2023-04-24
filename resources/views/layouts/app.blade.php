@@ -9,8 +9,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>Футбол</title>
-    <script src="{{ asset('js/main.js') }}"></script>
-    @vite(['resources/css/app.scss', 'resources/js/app.js'])
+    @vite(['resources/css/app.scss', 'resources/js/app.js', 'resources/js/main.js'])
     @yield('head')
 </head>
 <body>
