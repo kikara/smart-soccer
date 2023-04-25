@@ -8,8 +8,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class GameSettingTemplateController extends Controller
 {
-    public function show(GameSettingTemplate $template): JsonResource
+    public function show(GameSettingTemplate $setting): JsonResource
     {
-        return GameSettingTemplateResource::make($template);
+        return GameSettingTemplateResource::make($setting);
     }
 }

@@ -22,12 +22,12 @@ class TableOccupationController extends Controller
         return TableOccupationResource::make($tableOccupation);
     }
 
-    public function state(Request $request): JsonResponse
+    public function state(): JsonResponse
     {
         $currentDateTime = date('Y-m-d H:i:s');
 
-        $rows = TableOccupation::where('end_game', '>=', $currentDateTime)->first();
+        $occupation = TableOccupation::where('end_game', '>=', $currentDateTime)->first();
 
-        return $rows ? response()->json(['data' => true]) : response()->json(['data' => false]);
+        return $occupation ? response()->json(['data' => true]) : response()->json(['data' => false]);
     }
 }
