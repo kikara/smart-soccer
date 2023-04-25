@@ -37,7 +37,7 @@ class HttpClient
     public function setOccupation(Game $game, $fromUserId): void
     {
         $response = $this->client->post(
-            $this->query('/api/bot/occupations'),
+            $this->query('/api/occupations'),
             [
                 'headers' => [
                     'Accept' => 'application/json'
@@ -49,7 +49,7 @@ class HttpClient
         );
         if ($response->getStatusCode() === 200) {
             $data = $this->decodeContent($response->getBody()->getContents());
-            $game->setTableOccupationId($data['table_occupation_id']);
+            $game->setTableOccupationId($data['data']['id']);
             return;
         }
         throw new \RuntimeException('Table Occupation Request Error!');
@@ -62,8 +62,11 @@ class HttpClient
     public function getUserIdByTelegramChatId(int $chatId): int
     {
         $response = $this->client->get(
-            $this->query("/api/bot/telegrams/$chatId/user"),
-            ['headers' => ['Accept' => 'application/json']]
+            $this->query('/api/users/find'),
+            [
+                'headers' => ['Accept' => 'application/json'],
+                'query' => ['chat_id' => $chatId]
+            ]
         );
 
         if ($response->getStatusCode() !== 200) {
@@ -81,7 +84,7 @@ class HttpClient
     public function getSettings(int $id): array
     {
         $response = $this->client->get(
-            $this->query("/api/bot/settings/$id"),
+            $this->query("/api/settings/$id"),
             [
                 'headers' => [
                     'Accept' => 'application/json',
@@ -96,30 +99,6 @@ class HttpClient
         }
 
         return $this->decodeContent($response->getBody()->getContents());
-    }
-
-
-    /**
-     * @throws GuzzleException
-     * @throws JsonException
-     */
-    protected function sendRequest(string $url, array $params = []): array
-    {
-        $request = $this->client->post($this->query($url), [
-            'form_params' => $params
-        ]);
-
-        if ($request->getStatusCode() !== 200) {
-            throw new \RuntimeException('request has an error ' . $request->getStatusCode());
-        }
-
-        $response = $request->getBody()->getContents();
-        $decoded = json_decode($response, true, 512, JSON_THROW_ON_ERROR);
-
-        if (! is_array($decoded)) {
-            throw new \RuntimeException('response cant decoded');
-        }
-        return $decoded;
     }
 
     /**

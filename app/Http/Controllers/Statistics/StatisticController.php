@@ -5,11 +5,8 @@ namespace App\Http\Controllers\Statistics;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\StatisticResource;
 use App\Models\Game;
-use App\Models\Round;
 use App\Models\User;
-use App\Models\UserRating;
 use Illuminate\Http\Resources\Json\ResourceCollection;
-use Illuminate\Support\Facades\DB;
 
 class StatisticController extends Controller
 {

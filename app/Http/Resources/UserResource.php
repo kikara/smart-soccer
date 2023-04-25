@@ -25,6 +25,7 @@ class UserResource extends JsonResource
             'id' => $this->id,
             'login' => $this->login,
             'avatar_path' => ! empty($this->avatar_path) ? '/storage/' . $this->avatar_path : '/images/user/man.png',
+            'telegram_chat_id' => $this->telegram_chat_id,
         ];
     }
 }

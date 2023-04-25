@@ -76,4 +76,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(UserRating::class);
     }
+
+    public function settings(): HasMany
+    {
+        return $this->hasMany(GameSettingTemplate::class);
+    }
 }

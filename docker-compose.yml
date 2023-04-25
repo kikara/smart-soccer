@@ -25,7 +25,7 @@ services:
             - db
         container_name: soccer_app
         ports:
-            - "8776:8080"
+            - "8080:8080"
 
     db:
         image: mariadb
@@ -39,17 +39,6 @@ services:
         container_name: project_db
         ports:
             - "3306:3306"
-
-#    phpmyadmin:
-#        image: phpmyadmin
-#        depends_on:
-#            - db
-#        environment:
-#            MYSQL_ROOT_PASSWORD: root
-#        ports:
-#            - "8080:80"
-#        volumes:
-#            - ./pma-data:/var/lib/pma
 
 volumes:
     mariadb-data:
