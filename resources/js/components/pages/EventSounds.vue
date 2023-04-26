@@ -110,7 +110,7 @@
                     :key="item.id"
                     @destroy="destroy(item.id)"
                 >
-                    <div class="mt-2 d-flex gap-2">
+                    <div class="mt-2 d-flex gap-2 flex-wrap">
                         <v-chip
                             v-for="parameter in item.parameters"
                             color="primary"

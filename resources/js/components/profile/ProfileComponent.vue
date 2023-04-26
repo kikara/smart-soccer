@@ -8,7 +8,11 @@
                 <div class="d-flex flex-column">
                     <div class="position-relative" style="height: 105px">
                         <div class="position-absolute left-0 d-flex px-2 gap-3" style="top: -50px">
-                            <img :src="user.avatar_path" alt="" width="150" class="rounded-circle">
+                            <v-avatar
+                                :image="user.avatar_path"
+                                size="150"
+                            >
+                            </v-avatar>
                         </div>
                         <div style="margin-left: 170px" class="pt-1">
                             <div class="d-flex justify-content-between pt-2 pb-2 pe-2 align-items-center flex-wrap">
