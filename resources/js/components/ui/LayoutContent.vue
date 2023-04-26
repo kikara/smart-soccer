@@ -12,6 +12,23 @@
                         >
                             <nav-list></nav-list>
                         </v-sheet>
+
+                        <v-sheet
+                            rounded="0"
+                            class="mt-2 px-2"
+                            elevation="3"
+                        >
+                            <v-list>
+                                <v-list-item
+                                    title="Выйти"
+                                    value="logout"
+                                    prepend-icon="mdi-logout"
+                                    nav
+                                    @click="logout"
+                                >
+                                </v-list-item>
+                            </v-list>
+                        </v-sheet>
                     </div>
                     <div class="col-lg">
                         <slot></slot>
@@ -30,6 +47,12 @@ import Toast from "./Toast.vue";
 
 export default {
     name: "LayoutContent",
+    methods: {
+        logout() {
+            axios.post('/logout')
+                .then(response => window.location = '/')
+        },
+    },
     components: {Toast, NavigationDrawer, NavList}
 }
 </script>
