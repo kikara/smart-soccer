@@ -12,7 +12,7 @@ Auth::routes();
 Route::get('/', [GameController::class, 'index'])->name('index');
 
 Route::group(['prefix' => 'info'], function () {
-    Route::get('/{any}', fn () => view('index'))->where('any', '.*');
+    Route::get('/{any}', fn () => view('index'))->where('any', '.*')->middleware('auth');
 });
 
 Route::get('/debug', [DebugController::class, 'index'])->name('debug');

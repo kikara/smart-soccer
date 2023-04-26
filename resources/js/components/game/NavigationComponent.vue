@@ -14,7 +14,7 @@
                         </li>
 
                         <li class="nav-item" v-if="!$store.state.user.is_auth">
-                            <a class="nav-link" href="">Зарегистрироваться</a>
+                            <a class="nav-link" href="/register">Зарегистрироваться</a>
                         </li>
 
                         <li class="nav-item" v-if="$store.state.user.is_auth">
