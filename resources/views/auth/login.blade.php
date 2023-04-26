@@ -58,6 +58,9 @@
                 <button type="submit" class="btn btn-primary w-100 rounded-0">
                     Войти
                 </button>
+                <button class="btn btn-primary w-100 rounded-0" onclick="window.location='/register'">
+                    Зарегистрироваться
+                </button>
             </div>
         </form>
     @endsection

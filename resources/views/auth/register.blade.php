@@ -39,6 +39,9 @@
                 <button type="submit" class="btn btn-primary rounded-0 w-100">
                     Зарегистрироваться
                 </button>
+                <button class="btn btn-primary rounded-0 w-100" onclick="window.location='/login'">
+                    Войти
+                </button>
             </div>
         </form>
     @endsection
