@@ -7,14 +7,20 @@ use App\Http\Resources\StatisticResource;
 use App\Models\Game;
 use App\Models\User;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Support\Facades\Cache;
 
 class StatisticController extends Controller
 {
     public function index(): ResourceCollection
     {
-        $games = Game::all();
+        $games = Cache::remember('games', 3600, function () {
+            return Game::all();
+        });
 
-        $users = User::with(['gameUsers', 'ratings'])->get();
+        $users = Cache::remember('users', 3600, function () {
+            return User::with(['gameUsers', 'ratings'])->get();
+        });
+
 
         $users = $users->map(function ($user) use ($games) {
             $user->win = 0;
