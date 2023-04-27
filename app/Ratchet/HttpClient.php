@@ -47,10 +47,15 @@ class HttpClient
                 ]
             ]
         );
-        if ($response->getStatusCode() === 200) {
+        
+        $status = $response->getStatusCode();
+
+        if ($status >= 200 && $status < 300) {
             $data = $this->decodeContent($response->getBody()->getContents());
-            $game->setTableOccupationId($data['data']['id']);
-            return;
+            if ($id = (int) $data['data']['id']) {
+                $game->setTableOccupationId($id);
+                return;
+            }
         }
         throw new \RuntimeException('Table Occupation Request Error!');
     }
@@ -59,7 +64,7 @@ class HttpClient
      * @throws GuzzleException
      * @throws JsonException
      */
-    public function getUserIdByTelegramChatId(int $chatId): int
+    public function getUserIdByTelegramChatId($chatId): int
     {
         $response = $this->client->get(
             $this->query('/api/users/find'),
@@ -75,13 +80,15 @@ class HttpClient
 
         $data = $this->decodeContent($response->getBody()->getContents());
 
-        return (int) $data['id'];
+        $user = $data['data'];
+
+        return (int) $user['id'];
     }
 
     /**
      * @throws GuzzleException|JsonException
      */
-    public function getSettings(int $id): array
+    public function getSettings($id): array
     {
         $response = $this->client->get(
             $this->query("/api/settings/$id"),
@@ -98,7 +105,9 @@ class HttpClient
             );
         }
 
-        return $this->decodeContent($response->getBody()->getContents());
+        $data = $this->decodeContent($response->getBody()->getContents());
+
+        return $data['data'];
     }
 
     /**

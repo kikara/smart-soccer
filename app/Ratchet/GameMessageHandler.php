@@ -92,12 +92,17 @@ class GameMessageHandler
             return;
         }
 
-        $templateRow = $this->client->getSettings((int) $data['t_id']);
+        $templateRow = $this->client->getSettings($data['t_id']);
 
-        $fromUserID = $this->client->getUserIdByTelegramChatId((int) $data['f']);
+        $fromUserID = $this->client->getUserIdByTelegramChatId($data['f']);
 
-        $recipientUserID = $this->client->getUserIdByTelegramChatId((int) $data['r']);
+        $recipientUserID = $this->client->getUserIdByTelegramChatId($data['r']);
 
+        if (! $fromUserID || ! $recipientUserID || empty($templateRow)) {
+            throw new \RuntimeException('prepare data not loaded');
+        }
+
+        $this->client->setOccupation($this->game, $fromUserID);
 
         $toSide = GameSettingTemplate::oppositeSide($templateRow['side']);
 
@@ -112,7 +117,5 @@ class GameMessageHandler
             ->setGameSettingTemplate($data['t_id'])
             ->setGameMode($templateRow['mode'])
             ->setBusy();
-
-        $this->client->setOccupation($this->game, $fromUserID);
     }
 }
