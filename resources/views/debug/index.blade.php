@@ -1,12 +1,9 @@
-@extends('layouts.app')
+@extends('layouts.app_debug')
 
 @php
     $users = \App\Models\User::where('telegram_chat_id', '!=', '')->get();
 @endphp
 
-@section('head')
-    @vite(['resources/css/app.scss', 'resources/js/app.js', 'resources/js/debug/debug_index.js'])
-@endsection
 
 @section('content')
     <div id="debug-container" class="container">
