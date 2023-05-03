@@ -44,14 +44,17 @@
         </div>
         <!--  Control buttons  -->
         <div
-            class="position-absolute w-100 start-0 top-0 d-flex justify-content-center align-items-center flex-column min-vh-100">
-            <div class="d-flex flex-column gap-5 z-index-5 w-min-content">
-                <v-btn block rounded="lg" size="x-large" @click="this.$emit('reset-last')"
-                       elevation="0" style="font-size: 2rem;"
-                >Отмена последнего гола</v-btn>
-                <v-btn block rounded="lg" size="x-large" @click="this.$emit('end-game')"
-                       elevation="0" style="font-size: 2rem;"
-                >Завершить игру</v-btn>
+            class="position-absolute w-100 start-0 bottom-0 d-flex justify-content-center align-items-center min-vh-100">
+            <div class="ms-5 mb-5">
+                <v-btn
+                    block
+                    rounded="circle"
+                    @click="this.$emit('reset-last')"
+                    elevation="0"
+                    style="font-size: 5rem;z-index: 100"
+                    icon="mdi-restore"
+                >
+                </v-btn>
             </div>
         </div>
     </div>
