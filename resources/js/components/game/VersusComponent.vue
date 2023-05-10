@@ -1,38 +1,29 @@
 <template>
     <div>
-        <transition name="gate-left" @enter="closeState">
-            <div v-if="gateState" :class="{ 'versus-close-state': stateClosed }" class="versus z-index-100 red-side"></div>
+        <transition name="gate-left">
+            <div v-if="gates" class="versus versus-close-state z-index-100 blue-side"></div>
         </transition>
 
         <transition name="gate-right">
-            <div v-if="gateState" :class="{ 'versus-close-state': stateClosed }" class="versus z-index-100 blue-side"></div>
+            <div v-if="gates" class="versus versus-close-state z-index-100 red-side"></div>
         </transition>
 
         <transition name="versus">
             <!--  Versus Image  -->
-            <div v-if="infoState"
+            <div v-if="info"
                  class="position-absolute top-0 start-0 w-100 d-flex align-items-center justify-content-center min-vh-100" style="z-index: 150">
                 <div style="max-width: 250px" class="d-flex flex-column gap-4">
                     <img src="../../images/game/versus.png" width="150" class="align-self-center" alt=""/>
-                    <v-btn
-                        block
-                        size="x-large"
-                        @click="this.$emit('game-start')"
-                        elevation="0"
-                        style="background: transparent; font-size: 6rem;"
-                        class="font-primary"
-                    >Старт
-                    </v-btn>
                 </div>
             </div>
         </transition>
 
         <transition name="info">
             <!--  Gamers  -->
-            <div v-if="infoState"
+            <div v-if="info"
                 class="position-absolute d-flex top-0 start-0 w-100 justify-content-center align-items-center min-vh-100 z-index-100">
                 <div class="media-center-row">
-                    <div class="d-flex flex-column align-items-center" v-for="gamer in gamers">
+                    <div class="d-flex flex-column align-items-center" v-for="gamer in $store.state.game.gamers">
                         <v-avatar
                             :image="gamer.avatar"
                             size="200"
@@ -44,13 +35,29 @@
                 </div>
             </div>
         </transition>
+
+        <div class="position-absolute bottom-0 end-0">
+            <div
+                class="start-button position-relative"
+                v-if="info"
+            >
+                <v-icon
+                    @click="start"
+                    icon="mdi-play-circle"
+                    color="#04138b"
+                    class="rounded-circle p-2 play-icon"
+                ></v-icon>
+            </div>
+        </div>
+
     </div>
 </template>
 
 <script>
+import {getCurrentState} from "../../game/events";
+
 export default {
     name: "VersusComponent",
-    props: ['start', 'gamers'],
     data() {
         return {
             info: false,
@@ -58,24 +65,20 @@ export default {
             stateClosed: false,
         }
     },
-    computed: {
-        gateState() {
-            return this.gates && !this.start;
-        },
-        infoState() {
-            return this.info && !this.start;
-        },
-    },
     mounted() {
-        setTimeout(() => {
+        const state = getCurrentState();
+
+        if (!state.game_started) {
             this.gates = true;
             setTimeout(() => this.info = true, 400);
-        }, 200);
+        }
     },
     methods: {
-        closeState() {
-            this.stateClosed = true;
-        },
+        start() {
+            this.info = false;
+            this.gates = false;
+            this.$emit('start');
+        }
     }
 }
 </script>
@@ -98,14 +101,14 @@ export default {
     min-height: 100vh;
 }
 
-.red-side {
+.blue-side {
     top: 0;
     left: 0;
-    background-image: linear-gradient( 69.7deg,  rgba(216,81,82,1) 40%, rgba(154,27,69,1) 100.1% );
+    background-image: radial-gradient( circle farthest-corner at 10% 20%,  rgba(37,145,251,0.98) 0.1%, rgba(0,7,128,1) 99.8% );
 }
 
-.blue-side {
-    background-image: radial-gradient( circle farthest-corner at 10% 20%,  rgba(37,145,251,0.98) 0.1%, rgba(0,7,128,1) 99.8% );
+.red-side {
+    background-image: linear-gradient( 69.7deg,  rgba(216,81,82,1) 40%, rgba(154,27,69,1) 100.1% );
 }
 
 .z-index-100 {
@@ -126,7 +129,7 @@ export default {
         width: 50%;
         min-height: 100vh;
     }
-    .blue-side {
+    .red-side {
         top: 0;
         right: 0;
     }
@@ -153,7 +156,7 @@ export default {
         width: 100%;
         min-height: 50vh;
     }
-    .blue-side {
+    .red-side {
         bottom: 0;
         left: 0;
     }
@@ -186,4 +189,17 @@ export default {
     font-family: 'Rubik Wet Paint', cursive;
     color: lightyellow;
 }
+
+.start-button {
+    z-index: 200;
+    font-size: 6rem;
+    margin-right: 2rem;
+    margin-bottom: 1rem;
+}
+
+.play-icon {
+    background: whitesmoke;
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+}
+
 </style>
