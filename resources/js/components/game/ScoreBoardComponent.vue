@@ -14,8 +14,44 @@
 </template>
 
 <script>
+import {addListener, getCurrentState} from "../../game/events";
+
 export default {
-    name: "ScoreBoardComponent"
+    name: "ScoreBoardComponent",
+    mounted() {
+        const state = getCurrentState();
+
+        if (state.game_started) {
+            this.setScores(state);
+        }
+
+        addListener(this.eventHandle);
+    },
+    methods: {
+        eventHandle(event, state) {
+            switch (event) {
+                case 'updated':
+                    this.setScores(state);
+                    break;
+            }
+        },
+        setScores(state) {
+            for (const gamer of this.$store.state.game.gamers) {
+                const gamerState = Object.values(state.round.gamers).find(user => user.user_id === gamer.id);
+
+                gamer.score = Number(gamerState.score);
+
+                const enemyState = Object.values(state.round.gamers).find(user => user.user_id !== gamer.id);
+
+                gamer.progress = this.progress(enemyState.score);
+
+                this.$store.commit('update', gamer);
+            }
+        },
+        progress(value) {
+            return (10 - value) * 10;
+        },
+    }
 }
 </script>
 
