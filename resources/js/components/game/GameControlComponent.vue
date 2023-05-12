@@ -3,7 +3,7 @@
         class="position-absolute w-100 start-0 bottom-0 d-flex justify-content-center align-items-center min-vh-100">
         <div class="restore-container">
             <v-icon
-                @click="this.$emit('reset-last')"
+                @click="resetLastGoal"
                 rounded="circle"
                 icon="mdi-arrow-left-circle"
                 class="restore-icon rounded-circle"
@@ -16,7 +16,12 @@
 
 <script>
 export default {
-    name: "GameControlComponent"
+    name: "GameControlComponent",
+    methods: {
+        resetLastGoal() {
+            rws.send(JSON.stringify({cmd: 'resetLastGoal'}));
+        },
+    }
 }
 </script>
 
