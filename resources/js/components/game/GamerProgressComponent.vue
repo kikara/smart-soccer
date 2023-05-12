@@ -63,4 +63,7 @@ export default {
     font-size: 2.5rem;
     font-weight: 800;
 }
+.z-index-5 {
+    z-index: 5;
+}
 </style>
