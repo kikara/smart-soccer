@@ -1,7 +1,6 @@
 <template>
     <component
         :is="component"
-        @switch="setHome"
     ></component>
 </template>
 
@@ -14,41 +13,44 @@ export default {
     name: "Game",
     data() {
         return {
-            component: 'HomeComponent',
-            canHandle: true
+            component: null,
+            fetched: false,
         }
     },
-    created() {
+    mounted() {
+        if (rws.readyState === rws.CLOSED) {
+            this.component = 'HomeComponent';
+        }
+
         addListener(this.eventHandle);
 
         rws.send(JSON.stringify({cmd: 'state'}));
     },
     methods: {
         setHome() {
-            this.component = 'HomeComponent'
-            this.canHandle = true;
+            this.component = 'HomeComponent';
+            this.fetched = false;
         },
         eventHandle(event, state) {
-
-            if (!this.canHandle) {
-                return;
-            }
-
-            this.canHandle = false;
-
             switch (event) {
                 case 'updated':
                     if (state.is_busy) {
                         this.bookedState(state);
                     }
                     break;
-                default:
-                    this.canHandle = true;
             }
         },
         async bookedState(state) {
 
+            if (this.fetched) {
+                return;
+            }
+
+            await this.$store.commit('reset');
+
             await this.setGamers(state);
+
+            this.fetched = true;
 
             this.component = 'GameModeComponent';
         },
