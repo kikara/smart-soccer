@@ -20,7 +20,8 @@ class UserEventAudioController extends Controller
 
         $parameters = [];
         foreach ($validated['parameters'] as $parameter) {
-            $parameters[$parameter['parameter']] = $parameter['value'];
+            $parameters[$parameter['parameter']] = $parameter['parameter'] === 'winner' ?
+                1 : $parameter['value'];
         }
 
         $user = auth()->user();
