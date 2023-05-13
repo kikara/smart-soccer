@@ -5,16 +5,15 @@
 </template>
 
 <script>
-import {addListener, getCurrentState} from "../../game/events";
+import {addListener} from "../../game/events";
 import HomeComponent from "../game/HomeComponent.vue";
 import GameModeComponent from "../game/GameModeComponent.vue";
-
+import {booked, handleEvent, reset} from "../../game/audios";
 export default {
     name: "Game",
     data() {
         return {
             component: null,
-            fetched: false,
         }
     },
     mounted() {
@@ -26,23 +25,25 @@ export default {
 
         rws.send(JSON.stringify({cmd: 'state'}));
     },
+    unmounted() {
+        reset();
+    },
     methods: {
-        setHome() {
-            this.component = 'HomeComponent';
-            this.fetched = false;
-        },
         eventHandle(event, state) {
+            handleEvent(event, state);
             switch (event) {
                 case 'updated':
-                    if (state.is_busy) {
-                        this.bookedState(state);
+                    if (state.is_busy && !state.game_over) {
+                        this.setGameMode(state);
+                    } else {
+                        this.setHome();
                     }
                     break;
             }
         },
-        async bookedState(state) {
+        async setGameMode(state) {
 
-            if (this.fetched) {
+            if (this.component === 'GameModeComponent') {
                 return;
             }
 
@@ -50,9 +51,18 @@ export default {
 
             await this.setGamers(state);
 
-            this.fetched = true;
+            await booked(state);
 
             this.component = 'GameModeComponent';
+        },
+        setHome() {
+            if (this.component === 'HomeComponent') {
+                return;
+            }
+
+            this.component = 'HomeComponent';
+
+            this.$store.commit('reset');
         },
         async setGamers(state) {
             for (const item of Object.values(state.round.gamers)) {

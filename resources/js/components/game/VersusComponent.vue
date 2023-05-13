@@ -54,7 +54,7 @@
 </template>
 
 <script>
-import {getCurrentState} from "../../game/events";
+import {addListener, getCurrentState} from "../../game/events";
 
 export default {
     name: "VersusComponent",
@@ -71,14 +71,21 @@ export default {
         if (!state.game_started) {
             this.gates = true;
             setTimeout(() => this.info = true, 400);
+            addListener(this.eventHandle);
         }
     },
     methods: {
         start() {
-            this.info = false;
-            this.gates = false;
-            this.$emit('start');
-        }
+            rws.send(JSON.stringify({cmd: 'start'}));
+        },
+        eventHandle(event, state) {
+            switch (event) {
+                case 'started':
+                    this.info = false;
+                    this.gates = false;
+                    break;
+            }
+        },
     }
 }
 </script>

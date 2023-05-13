@@ -44,8 +44,41 @@
 </template>
 
 <script>
+import {addListener, getCurrentState} from "../../game/events";
+
 export default {
-    name: "GamerProgressComponent"
+    name: "GamerProgressComponent",
+    mounted() {
+        const state = getCurrentState();
+
+        if (state.game_started) {
+            this.setRounds(state);
+        }
+
+        addListener(this.eventHandle);
+    },
+    methods: {
+        eventHandle(event, state) {
+            switch (event) {
+                case 'new_round':
+                    this.setRounds(state);
+                    break;
+            }
+        },
+        setRounds(state) {
+            for (const gamer of this.$store.state.game.gamers) {
+                const isWinner = state.rounds.find(round => round.winner_id === gamer.id);
+                const rounds = isWinner ? 1 : 0;
+
+                this.$store.commit('update', {
+                    id: gamer.id,
+                    options: {
+                        rounds
+                    }
+                });
+            }
+        },
+    }
 }
 </script>
 

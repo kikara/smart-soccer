@@ -37,15 +37,21 @@ export default {
         },
         setScores(state) {
             for (const gamer of this.$store.state.game.gamers) {
+
                 const gamerState = Object.values(state.round.gamers).find(user => user.user_id === gamer.id);
 
-                gamer.score = Number(gamerState.score);
+                const options = {};
+
+                options.score = Number(gamerState.score);
 
                 const enemyState = Object.values(state.round.gamers).find(user => user.user_id !== gamer.id);
 
-                gamer.progress = this.progress(enemyState.score);
+                options.progress = this.progress(enemyState.score);
 
-                this.$store.commit('update', gamer);
+                this.$store.commit('update', {
+                    id: gamer.id,
+                    options
+                });
             }
         },
         progress(value) {

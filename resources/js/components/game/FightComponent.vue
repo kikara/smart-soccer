@@ -3,11 +3,9 @@
 
     <score-board-component></score-board-component>
 
-    <game-time-component :time="time"></game-time-component>
+    <game-time-component></game-time-component>
 
-    <game-control-component
-        @resetLast=""
-    ></game-control-component>
+    <game-control-component></game-control-component>
 
     <img class="background soccer-back" src="../../images/game/back.png" alt=""/>
 
@@ -22,42 +20,8 @@ import GameControlComponent from "./GameControlComponent.vue";
 
 export default {
     name: "FightComponent",
-    data() {
-        return {
-            seconds: 0,
-            time: '00:00',
-            visible: true
-        }
-    },
     methods: {
-        startTimer() {
-            const now = Math.floor(new Date().valueOf() / 1000);
-            this.seconds = now - this.startTime;
-            this.interval = setInterval(this.timer, 1000);
-        },
-        timer() {
-            this.seconds++;
 
-            const minutes = Math.floor(this.seconds / 60);
-            const seconds = this.seconds - (minutes * 60);
-
-            this.time = (minutes > 9 ? minutes : '0' + minutes) + ':' + (seconds > 9 ? seconds : '0' + seconds);
-        },
-        stop() {
-            clearInterval(this.interval);
-        }
-    },
-    watch: {
-        start(val) {
-            if (val) {
-                this.startTimer();
-            }
-        },
-    },
-    mounted() {
-        if (this.start) {
-            this.startTimer();
-        }
     },
     components: {GameControlComponent, GameTimeComponent, GamerProgressComponent, ScoreBoardComponent},
 }

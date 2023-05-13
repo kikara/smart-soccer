@@ -1,16 +1,16 @@
-import GameIndexComponent from "../components/game/GameIndexComponent.vue";
 import ProfileComponent from "../components/pages/Profile.vue";
 import {createRouter, createWebHistory} from "vue-router";
 import Statistic from "../components/pages/Statistics.vue";
 import Setting from "../components/pages/Settings.vue";
 import Sounds from "../components/pages/Sounds.vue";
 import EventSounds from "../components/pages/EventSounds.vue";
+import Game from "../components/pages/Game.vue";
 
 
 const routes = [
     {
         path: '/',
-        component: GameIndexComponent
+        component: Game
     },
     {
         path: '/info/personal/:id',
