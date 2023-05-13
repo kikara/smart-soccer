@@ -50,7 +50,7 @@ export default {
         },
         eventHandle(event, state) {
             switch (event) {
-                case 'start':
+                case 'started':
                     this.init(state);
                     break;
             }
