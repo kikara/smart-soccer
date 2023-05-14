@@ -16,7 +16,7 @@ class GameRepository
 {
     public function getLastGames()
     {
-        return Game::limit(10)
+        return Game::limit(5)
             ->orderByDesc('id')
             ->with(['users', 'rounds'])
             ->get();

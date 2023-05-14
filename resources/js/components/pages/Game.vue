@@ -14,10 +14,11 @@ export default {
     data() {
         return {
             component: null,
+            loaded: false,
         }
     },
     mounted() {
-        if (rws.readyState === rws.CLOSED) {
+        if (rws.readyState !== rws.OPEN) {
             this.component = 'HomeComponent';
         }
 
@@ -43,9 +44,11 @@ export default {
         },
         async setGameMode(state) {
 
-            if (this.component === 'GameModeComponent') {
+            if (this.component === 'GameModeComponent' || this.loaded) {
                 return;
             }
+
+            this.loaded = true;
 
             await this.$store.commit('reset');
 
@@ -54,6 +57,8 @@ export default {
             await booked(state);
 
             this.component = 'GameModeComponent';
+
+            this.loaded = false;
         },
         setHome() {
             if (this.component === 'HomeComponent') {
